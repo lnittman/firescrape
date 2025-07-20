@@ -1,0 +1,534 @@
+// Prisma schema for Yuba - AI-native outdoor companion for 27+ activities
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+  output          = "../generated/client"
+}
+
+datasource db {
+  provider     = "postgresql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+// Core Models
+
+model User {
+  id        String   @id @default(uuid())
+  userId    String   @unique // Clerk user ID
+  username  String?  @unique @db.VarChar(50)
+  email     String   @unique
+  name      String?  @db.VarChar(100)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Profile data
+  fitnessLevel     Int     @default(5) // 1-10 scale
+  location         String? @db.VarChar(100)
+  emergencyContact Json? // { name: string, phone: string, relationship: string }
+  tier             String  @default("free")
+
+  // Relationships
+  savedLocations  SavedLocation[]
+  activities      Activity[]
+  trips           Trip[]
+  preferences     UserPreferences?
+  aiSettings      AISettings?
+  analyticsEvents AnalyticsEvent[]
+  feedback        Feedback[]
+  interests       UserInterest[]
+
+  @@index([userId])
+  @@index([username])
+}
+
+// ActivityLocation represents any outdoor location: trails, climbing areas, ski resorts,
+// campgrounds, lakes, rivers, beaches, parks, etc. It's designed to be polymorphic
+// and support all 27+ outdoor activity types
+model ActivityLocation {
+  id          String  @id @default(uuid())
+  name        String  @db.VarChar(200)
+  description String? @db.Text
+
+  // Universal location data
+  latitude  Float
+  longitude Float
+  region    String? @db.VarChar(100)
+
+  // Polymorphic metrics (interpreted based on activity types)
+  primaryMetric   Float? // Distance (miles), vertical (feet), area (acres), etc.
+  secondaryMetric Float? // Elevation gain, water depth, route count, etc.
+  difficulty      LocationDifficulty @default(MODERATE)
+  typicalDuration Int? // Typical duration in minutes
+
+  // Location type and features
+  locationType        LocationType
+  supportedActivities OutdoorActivityType[]
+  features            String[] // "parking", "restrooms", "permits_required", etc.
+
+  // Conditions and updates
+  conditions  Json? // Current conditions from various sources
+  lastUpdated DateTime?
+
+  // Search and discovery
+  // embedding     Unsupported("vector(1536)")? // For semantic search
+
+  // Timestamps
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relationships
+  savedBy    SavedLocation[]
+  activities Activity[]
+
+  @@index([locationType])
+  @@index([difficulty])
+  @@index([region])
+  @@index([supportedActivities])
+}
+
+model SavedLocation {
+  id         String   @id @default(cuid())
+  userId     String
+  locationId String
+  savedAt    DateTime @default(now())
+  notes      String?  @db.Text
+
+  user     User             @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  location ActivityLocation @relation(fields: [locationId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, locationId])
+  @@index([userId])
+}
+
+model Activity {
+  id           String       @id @default(uuid())
+  userId       String
+  locationId   String?
+  tripId       String?
+  entityId     String // Polymorphic reference
+  entityType   EntityType
+  activityType ActivityType
+  metadata     Json? // Activity-specific data
+  createdAt    DateTime     @default(now())
+
+  user     User              @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  location ActivityLocation? @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  trip     Trip?             @relation(fields: [tripId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([entityId, entityType])
+  @@index([activityType, createdAt])
+}
+
+model Trip {
+  id            String                @id @default(uuid())
+  userId        String
+  title         String                @db.VarChar(200)
+  description   String?               @db.Text
+  location      String?               @db.VarChar(200)
+  coordinates   Json? // {lat, lng}
+  activityTypes OutdoorActivityType[] // Can be multi-activity
+  difficulty    TripDifficulty        @default(MODERATE)
+  distance      Float? // Total distance
+  duration      Int? // Total duration in minutes
+  elevationGain Int? // Total elevation change
+  startDate     DateTime
+  endDate       DateTime?
+  status        TripStatus            @default(PLANNED)
+  weather       Json?
+  photos        String[]
+  notes         String?               @db.Text
+  rating        Int? // 1-5
+  isPublic      Boolean               @default(false)
+  createdAt     DateTime              @default(now())
+  updatedAt     DateTime              @updatedAt
+
+  user       User       @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  activities Activity[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([startDate])
+  @@index([isPublic])
+  @@index([userId, activityTypes])
+}
+
+// User preferences and settings
+
+model UserPreferences {
+  id     String @id @default(uuid())
+  userId String @unique
+
+  // Appearance
+  fontFamily String @default("iosevka-term")
+
+  // Notifications
+  notifyWeeklySummary  Boolean @default(false)
+  notifyFeatureUpdates Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model AISettings {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  rules     String?  @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model UserInterest {
+  id     String @id @default(uuid())
+  userId String
+
+  activityType      OutdoorActivityType
+  interestLevel     InterestLevel       @default(INTERESTED)
+  experienceLevel   ExperienceLevel     @default(BEGINNER)
+  specificInterests String[] // "dawn patrol", "alpine lakes", etc.
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  @@unique([userId, activityType])
+  @@index([userId])
+  @@index([activityType])
+}
+
+// Project management and monitoring
+
+model Project {
+  id            String  @id @default(uuid())
+  name          String  @db.VarChar(200)
+  description   String? @db.Text
+  repositoryUrl String? @db.VarChar(500)
+
+  // CI/Build metrics
+  healthPercent   Float?    @default(0) // Overall health percentage (0-100)
+  lastBuildStatus String? // "success", "failure", "pending", "cancelled"
+  testPassPercent Float? // Test pass percentage (0-100)
+  coveragePercent Float? // Code coverage percentage (0-100)
+  lastBuildAt     DateTime?
+
+  // Dependency metrics
+  dependenciesOutdated Int       @default(0) // Count of outdated dependencies
+  securityAlerts       Int       @default(0) // Count of open security alerts
+  lastDepsCheckAt      DateTime?
+  lastSecurityCheckAt  DateTime?
+
+  // GitHub/Vercel integration data
+  githubRepository     String? // "owner/repo" format
+  vercelProjectId      String?
+  githubInstallationId String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relationships
+  builds           Build[]
+  dependencyChecks DependencyCheck[]
+
+  @@index([healthPercent])
+  @@index([lastBuildAt])
+  @@index([dependenciesOutdated])
+  @@index([securityAlerts])
+}
+
+model Build {
+  id        String @id @default(uuid())
+  projectId String
+
+  // Build details
+  buildNumber   String?
+  status        String // "success", "failure", "pending", "cancelled"
+  branch        String?
+  commitSha     String?
+  commitMessage String? @db.Text
+
+  // Metrics
+  duration     Int? // Build duration in seconds
+  testsPassed  Int? // Number of tests passed
+  testsFailed  Int? // Number of tests failed
+  testsSkipped Int? // Number of tests skipped
+  coverage     Float? // Code coverage percentage
+
+  // Source metadata
+  source       String // "github_actions", "vercel", etc.
+  workflowName String?
+  jobName      String?
+  externalId   String? // External build/workflow run ID
+  externalUrl  String? // Link to build details
+
+  startedAt   DateTime?
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId, completedAt])
+  @@index([status])
+  @@index([source])
+}
+
+model DependencyCheck {
+  id        String @id @default(uuid())
+  projectId String
+
+  // Dependency analysis
+  totalDependencies    Int @default(0)
+  outdatedDependencies Int @default(0)
+  securityAlerts       Int @default(0)
+  criticalAlerts       Int @default(0)
+  highAlerts           Int @default(0)
+  moderateAlerts       Int @default(0)
+  lowAlerts            Int @default(0)
+
+  // Source metadata
+  source     String // "dependabot", "renovate", "snyk", etc.
+  checkType  String // "dependencies", "security", "both"
+  externalId String? // External check/scan ID
+
+  // Raw data for debugging
+  rawData Json?
+
+  checkedAt DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId, checkedAt])
+  @@index([source])
+  @@index([checkType])
+}
+
+// Utility models
+
+model Feedback {
+  id        String             @id @default(uuid())
+  topic     FeedbackTopic
+  message   String
+  sentiment FeedbackSentiment?
+  userAgent String?
+  url       String?
+  userId    String?
+  status    FeedbackStatus     @default(OPEN)
+  createdAt DateTime           @default(now())
+  updatedAt DateTime           @updatedAt
+
+  user User? @relation(fields: [userId], references: [userId], onDelete: SetNull)
+
+  @@index([topic])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model AnalyticsEvent {
+  id         String   @id @default(cuid())
+  userId     String
+  locationId String?
+  eventType  String
+  properties Json?
+  timestamp  DateTime @default(now())
+  sessionId  String?
+
+  user User @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  @@index([userId, timestamp])
+  @@index([locationId, timestamp])
+  @@index([eventType, timestamp])
+}
+
+// Enums
+
+enum LocationType {
+  TRAIL // Hiking, biking, running trails
+  CLIMBING_AREA // Rock climbing crags, bouldering areas
+  WATER_ACCESS // Lakes, rivers, beaches for water sports
+  SKI_AREA // Ski resorts, backcountry zones
+  CAMPGROUND // Campgrounds, RV parks, backcountry sites
+  PARK // Parks, recreation areas
+  VIEWPOINT // Scenic viewpoints, photography spots
+  MIXED_USE // Locations supporting many activity types
+}
+
+// Universal difficulty scale applicable to all activities
+enum LocationDifficulty {
+  BEGINNER // Green runs, Class 1-2, 5.0-5.6, etc.
+  EASY // Easy trails, mellow water, groomed runs
+  MODERATE // Blue runs, Class 3, 5.7-5.9, moderate fitness
+  CHALLENGING // Black runs, Class 4, 5.10-5.11, experienced
+  DIFFICULT // Double black, Class 5, 5.12+, expert only
+  EXTREME // Extreme terrain, high consequence
+}
+
+enum EntityType {
+  LOCATION // Any outdoor activity location
+  USER
+  TRIP
+  ACTIVITY
+}
+
+enum ActivityType {
+  // Location interactions
+  LOCATION_VIEWED
+  LOCATION_SAVED
+  LOCATION_UNSAVED
+  LOCATION_COMPLETED
+  LOCATION_REVIEWED
+  LOCATION_SHARED
+
+  // Activity tracking
+  ACTIVITY_STARTED
+  ACTIVITY_PAUSED
+  ACTIVITY_RESUMED
+  ACTIVITY_COMPLETED
+  ACTIVITY_DELETED
+
+  // Trip management
+  TRIP_CREATED
+  TRIP_COMPLETED
+  TRIP_UPDATED
+  TRIP_SHARED
+  TRIP_DELETED
+
+  // User actions
+  USER_PROFILE_UPDATED
+  USER_PREFERENCES_UPDATED
+  USER_INTEREST_ADDED
+  USER_INTEREST_UPDATED
+}
+
+enum TripDifficulty {
+  EASY
+  MODERATE
+  CHALLENGING
+  DIFFICULT
+  EXTREME
+}
+
+enum TripStatus {
+  PLANNED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum FeedbackTopic {
+  BUG
+  FEATURE
+  UI
+  PERFORMANCE
+  GENERAL
+  LOCATION_DATA
+  ACTIVITY_REQUEST
+}
+
+enum FeedbackSentiment {
+  POSITIVE
+  NEGATIVE
+}
+
+enum FeedbackStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+// Comprehensive outdoor activity types (27+)
+enum OutdoorActivityType {
+  // Trail sports
+  HIKING
+  TRAIL_RUNNING
+  BACKPACKING
+
+  // Cycling
+  MOUNTAIN_BIKING
+  ROAD_BIKING
+  GRAVEL_BIKING
+
+  // Climbing & mountaineering
+  ROCK_CLIMBING
+  BOULDERING
+  ICE_CLIMBING
+  MOUNTAINEERING
+  VIA_FERRATA
+
+  // Water sports
+  KAYAKING
+  CANOEING
+  PADDLEBOARDING
+  SWIMMING
+  FISHING
+  RAFTING
+  SURFING
+  KITEBOARDING
+
+  // Winter sports
+  SKIING
+  SNOWBOARDING
+  BACKCOUNTRY_SKIING
+  CROSS_COUNTRY_SKIING
+  SNOWSHOEING
+  ICE_SKATING
+
+  // Camping
+  TENT_CAMPING
+  RV_CAMPING
+  BACKCOUNTRY_CAMPING
+  GLAMPING
+
+  // Nature activities
+  WILDLIFE_VIEWING
+  BIRDWATCHING
+  PHOTOGRAPHY
+  STARGAZING
+  FORAGING
+  NATURE_WALKING
+
+  // Adventure sports
+  PARAGLIDING
+  HANG_GLIDING
+  BASE_JUMPING
+  CANYONING
+  CAVING
+
+  // Other activities
+  OFF_ROADING
+  HORSEBACK_RIDING
+  OUTDOOR_FITNESS
+  ADVENTURE_RACING
+  GEOCACHING
+}
+
+enum InterestLevel {
+  CURIOUS
+  INTERESTED
+  ENTHUSIASTIC
+  PASSIONATE
+}
+
+enum ExperienceLevel {
+  NEVER_TRIED
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+  EXPERT
+}
+
+// Compatibility mappings for migration
+// Old Trail model -> New ActivityLocation model
+// Old SavedTrail -> New SavedLocation
+// Old trailId references -> locationId
+// Old TRAIL_ activity types -> LOCATION_ activity types

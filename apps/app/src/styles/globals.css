@@ -1,0 +1,412 @@
+@import '@repo/design/styles/globals.css';
+
+/* 
+ * YUBA TYPOGRAPHY SYSTEM - Technical Outdoor Aesthetic
+ * 
+ * Body Text: CX80-0 (clean technical) - GPS devices, weather stations
+ * UI Elements: CX80-1 (subtle tech) - gear specs, navigation
+ * Specifications: CX80-2 (technical) - measurements, ratings
+ * Annotations: CX80-3 (stylized) - special callouts
+ * Display/Titles: Louize Display - mystical outdoor vibes
+ * 
+ * Alternative technical fonts:
+ * - Milling: Precision engineering feel (carabiner specs)
+ * - KMR Apparat: German technical equipment aesthetic
+ * 
+ * Usage: Apply .font-tech-body, .font-tech-ui, .font-tech-spec classes
+ */
+
+/* Custom Fonts */
+@font-face {
+  font-family: 'CommitMono-Regular';
+  src: url('https://intdev-global.s3.us-west-2.amazonaws.com/public/internet-dev/3fecb478-80cf-41c5-b834-8562ab0baae0.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'DepartureMono-Regular';
+  src: url('https://intdev-global.s3.us-west-2.amazonaws.com/public/internet-dev/2ed59eb2-a4a6-490c-8d70-757b68af681d.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'FiraCode-Regular';
+  src: url('https://intdev-global.s3.us-west-2.amazonaws.com/public/internet-dev/6cf7752d-f7c3-48b2-8149-2d0d39bc008a.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'FragmentMono-Regular';
+  src: url('https://intdev-global.s3.us-west-2.amazonaws.com/public/internet-dev/102755cd-b36a-4db8-907e-c915b322107a.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'GeistMono-Regular';
+  src: url('https://intdev-global.s3.us-west-2.amazonaws.com/public/internet-dev/996b00fb-4b7a-403d-8da2-ce2225450681.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'IosevkaTerm-Regular';
+  src: url('https://intdev-global.s3.us-west-2.amazonaws.com/public/internet-dev/6397be61-3ea4-459d-8a3e-fd95168cb214.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'JetBrainsMono-Regular';
+  src: url('https://next-s3-public.s3.us-west-2.amazonaws.com/JetBrainsMono-Regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'SFMonoSquare-Regular';
+  src: url('https://intdev-global.s3.us-west-2.amazonaws.com/public/internet-dev/d94a73b5-d1c5-4a97-9b2d-18e5941833f6.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'ServerMono-Regular';
+  src: url('https://intdev-global.s3.us-west-2.amazonaws.com/public/internet-dev/6c8ad1f3-2ad9-44a9-88db-46ff3f19c4f3.woff') format('woff');
+}
+
+@font-face {
+  font-family: 'TX02Mono-Regular';
+  src: url('https://intdev-global.s3.us-west-2.amazonaws.com/public/internet-dev/e049dfb6-9c5d-4ac4-97c2-eb6e95c61d09.woff2') format('woff2');
+}
+
+/* Sacred-inspired terminal aesthetic enhancements */
+@layer base {
+  :root {
+    /* Terminal-inspired colors */
+    --terminal-green: oklch(0.73 0.16 142.5);
+    --terminal-amber: oklch(0.75 0.13 80);
+    --terminal-red: oklch(0.65 0.2 28);
+    --terminal-blue: oklch(0.65 0.15 240);
+    
+    /* Enhanced spacing for monospace grid */
+    --char-width: 0.6ch;
+    --line-height: 1.25;
+    
+    /* Terminal effects */
+    --glow-strength: 0.5;
+    --scan-line-opacity: 0.03;
+
+    /* Technical fonts for gorp-core aesthetic */
+    --font-mono: 'IosevkaTerm-Regular', 'GeistMono-Regular', Consolas, monaco, monospace;
+    --font-body: 'CX80-0', 'CX80', var(--font-geist-sans), system-ui, sans-serif;
+    --font-display: 'Louize Display', var(--font-geist-sans), system-ui, sans-serif;
+    
+    /* CX80 Variants Guide:
+       CX80-0: Clean/minimal - best for body text
+       CX80-1: Subtle technical details - good for UI elements
+       CX80-2: More technical features - callouts/specs
+       CX80-3: Most stylized - special annotations
+    */
+  }
+  
+  /* Monospace grid alignment */
+  body {
+    line-height: var(--line-height);
+    font-feature-settings: "kern" 0, "liga" 0, "calt" 0;
+    font-family: var(--font-mono);
+  }
+
+  /* Apply font family to all elements EXCEPT Clerk Elements - exclude any element with cl- class or data-clerk attribute */
+  *:not([class*="cl-"]):not([data-clerk]):not([id*="clerk"]), 
+  *:not([class*="cl-"]):not([data-clerk]):not([id*="clerk"])::before, 
+  *:not([class*="cl-"]):not([data-clerk]):not([id*="clerk"])::after {
+    font-family: var(--font-mono);
+  }
+  
+  /* Apply font-mono class with more specific selectors */
+  .font-mono:not([class*="cl-"]):not([data-clerk]),
+  button.font-mono:not([class*="cl-"]):not([data-clerk]),
+  input.font-mono:not([class*="cl-"]):not([data-clerk]),
+  textarea.font-mono:not([class*="cl-"]):not([data-clerk]),
+  select.font-mono:not([class*="cl-"]):not([data-clerk]),
+  label.font-mono:not([class*="cl-"]):not([data-clerk]),
+  span.font-mono:not([class*="cl-"]):not([data-clerk]),
+  div.font-mono:not([class*="cl-"]):not([data-clerk]),
+  p.font-mono:not([class*="cl-"]):not([data-clerk]),
+  h1.font-mono:not([class*="cl-"]):not([data-clerk]),
+  h2.font-mono:not([class*="cl-"]):not([data-clerk]),
+  h3.font-mono:not([class*="cl-"]):not([data-clerk]),
+  h4.font-mono:not([class*="cl-"]):not([data-clerk]),
+  h5.font-mono:not([class*="cl-"]):not([data-clerk]),
+  h6.font-mono:not([class*="cl-"]):not([data-clerk]) {
+    font-family: var(--font-mono) !important;
+  }
+
+  /* Exception: Keep logo with fixed TX02 Mono font */
+  .yuba-logo-fixed-font,
+  .yuba-logo-fixed-font *,
+  pre.yuba-logo-fixed-font {
+    font-family: 'TX02Mono-Regular', Consolas, monaco, monospace !important;
+  }
+
+  /* Unauthenticated pages use CX80-0 (cleanest variant) for that technical outdoor gear aesthetic */
+  /* Carefully exclude Clerk Elements to prevent form breakage */
+  .unauthenticated-layout {
+    font-family: 'CX80-0', 'CX80', var(--font-geist-sans), system-ui, sans-serif;
+  }
+  
+  /* Apply to specific elements, excluding Clerk's form elements */
+  .unauthenticated-layout p:not([class*="cl-"]):not([data-clerk]),
+  .unauthenticated-layout h1:not([class*="cl-"]):not([data-clerk]),
+  .unauthenticated-layout h2:not([class*="cl-"]):not([data-clerk]),
+  .unauthenticated-layout h3:not([class*="cl-"]):not([data-clerk]),
+  .unauthenticated-layout span:not([class*="cl-"]):not([data-clerk]):not(.font-display),
+  .unauthenticated-layout div:not([class*="cl-"]):not([data-clerk]):not(.font-display) {
+    font-family: 'CX80-0', 'CX80', var(--font-geist-sans), system-ui, sans-serif;
+  }
+  
+  /* Louize Display for mystical titles and branding */
+  .font-display,
+  .font-display * {
+    font-family: 'Louize Display', var(--font-geist-sans), system-ui, sans-serif !important;
+    font-weight: 500; /* Medium weight for better presence */
+    letter-spacing: -0.02em; /* Tighten slightly for display */
+  }
+
+  /* Technical outdoor gear typography utilities */
+  .font-tech-body {
+    font-family: 'CX80-0', 'CX80', var(--font-geist-sans), system-ui, sans-serif;
+  }
+
+  .font-tech-ui {
+    font-family: 'CX80-1', 'CX80', var(--font-geist-sans), system-ui, sans-serif;
+  }
+
+  .font-tech-spec {
+    font-family: 'CX80-2', 'CX80', var(--font-geist-sans), system-ui, sans-serif;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    font-size: 0.875rem;
+  }
+
+  .font-tech-annotation {
+    font-family: 'CX80-3', 'CX80', var(--font-geist-sans), system-ui, sans-serif;
+  }
+
+  /* Alternative technical fonts for variety */
+  .font-milling {
+    font-family: 'Milling Simplex 0.5mm', 'CX80-1', var(--font-mono);
+    letter-spacing: 0.01em;
+  }
+
+  .font-apparat {
+    font-family: 'KMR Apparat', 'CX80-0', var(--font-geist-sans), system-ui, sans-serif;
+  }
+
+  /* Font selection classes */
+  .font-commit-mono {
+    --font-mono: 'CommitMono-Regular', Consolas, monaco, monospace;
+  }
+
+  .font-departure-mono {
+    --font-mono: 'DepartureMono-Regular', Consolas, monaco, monospace;
+  }
+
+  .font-fira-code {
+    --font-mono: 'FiraCode-Regular', Consolas, monaco, monospace;
+  }
+
+  .font-fragment-mono {
+    --font-mono: 'FragmentMono-Regular', Consolas, monaco, monospace;
+  }
+
+  .font-geist-mono {
+    --font-mono: 'GeistMono-Regular', Consolas, monaco, monospace;
+  }
+
+  .font-iosevka-term {
+    --font-mono: 'IosevkaTerm-Regular', Consolas, monaco, monospace;
+  }
+
+  .font-jetbrains-mono {
+    --font-mono: 'JetBrainsMono-Regular', Consolas, monaco, monospace;
+  }
+
+  .font-sfmono-square {
+    --font-mono: 'SFMonoSquare-Regular', Consolas, monaco, monospace;
+  }
+
+  .font-server-mono {
+    --font-mono: 'ServerMono-Regular', Consolas, monaco, monospace;
+  }
+
+  .font-tx02-mono {
+    --font-mono: 'TX02Mono-Regular', Consolas, monaco, monospace;
+  }
+  
+  /* Terminal glow effect for focused elements */
+  .terminal-glow {
+    text-shadow: 
+      0 0 5px rgba(0, 255, 0, var(--glow-strength)),
+      0 0 10px rgba(0, 255, 0, calc(var(--glow-strength) * 0.5));
+  }
+  
+  /* Scanline effect */
+  .terminal-scanlines::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(255, 255, 255, var(--scan-line-opacity)) 2px,
+      rgba(255, 255, 255, var(--scan-line-opacity)) 4px
+    );
+    pointer-events: none;
+    z-index: 1000;
+  }
+  
+  /* Monospace text alignment helper */
+  .mono-grid {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0;
+  }
+  
+  /* Terminal cursor blink */
+  @keyframes terminal-blink {
+    0%, 49% { opacity: 1; }
+    50%, 100% { opacity: 0; }
+  }
+  
+  .terminal-cursor {
+    animation: terminal-blink 1s step-start infinite;
+  }
+  
+  /* Enhanced focus states */
+  *:focus-visible {
+    outline: 2px solid var(--terminal-green);
+    outline-offset: 2px;
+  }
+  
+  /* Terminal-style scrollbar */
+  /* ::-webkit-scrollbar {
+    width: 12px;
+    height: 12px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: var(--background);
+    border: 1px solid var(--border);
+  }
+  
+  ::-webkit-scrollbar-thumb {
+    background: var(--muted);
+    border: 1px solid var(--border);
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--muted-foreground);
+  } */
+  
+  /* Hide scrollbar utility */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* ASCII art decorations */
+  .ascii-border {
+    position: relative;
+  }
+  
+  .ascii-border::before {
+    content: "╔════════════════════════════════════════════════════════════╗";
+    position: absolute;
+    top: -1.5em;
+    left: 0;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--muted-foreground);
+    white-space: pre;
+    pointer-events: none;
+  }
+  
+  .ascii-border::after {
+    content: "╚════════════════════════════════════════════════════════════╝";
+    position: absolute;
+    bottom: -1.5em;
+    left: 0;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--muted-foreground);
+    white-space: pre;
+    pointer-events: none;
+  }
+}
+
+/* Terminal-style animations */
+@keyframes terminal-type {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+@keyframes terminal-fade-in {
+  from { 
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Utility classes */
+.terminal-type {
+  overflow: hidden;
+  white-space: nowrap;
+  animation: terminal-type 0.5s steps(40, end);
+}
+
+.terminal-fade {
+  animation: terminal-fade-in 0.3s ease-out;
+}
+
+/* Streaming cursor animation */
+@keyframes streaming-cursor {
+  0%, 100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.streaming-cursor {
+  animation: streaming-cursor 1s ease-in-out infinite;
+}
+
+/* Scale unauthenticated pages on very small screens to avoid scrolling */
+@media (max-height: 500px) {
+  .unauthenticated-layout .content-wrapper {
+    transform: scale(0.9);
+  }
+}
+
+@media (max-height: 400px) {
+  .unauthenticated-layout .content-wrapper {
+    transform: scale(0.8);
+  }
+}
+
+/* HIGHEST PRIORITY: Logo font override - must be at the very end */
+html .yuba-logo-fixed-font,
+html .yuba-logo-fixed-font *,
+html pre.yuba-logo-fixed-font,
+body .yuba-logo-fixed-font,
+body .yuba-logo-fixed-font *,
+body pre.yuba-logo-fixed-font {
+  font-family: 'TX02Mono-Regular', Consolas, monaco, monospace !important;
+}
+
+/* Hide ONLY the default shadcn Dialog close button when using custom close button */
+/* This targets the close button that's a direct child of DialogContent */
+.hide-default-close > button.absolute.right-4.top-4:has(.lucide-x) {
+  display: none !important;
+}

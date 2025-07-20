@@ -1,0 +1,12 @@
+import { createMetadata } from '@repo/seo/metadata';
+import type { Metadata } from 'next';
+import { CustomSignIn } from '@/components/auth/sign-in';
+
+const title = 'Sign In';
+const description = 'Discover trails and plan your outdoor adventures with AI.';
+
+export const metadata: Metadata = createMetadata({ title, description });
+
+export default function SignInPage() {
+  return <CustomSignIn />;
+}

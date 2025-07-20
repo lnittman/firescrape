@@ -1,0 +1,40 @@
+{
+  "name": "api",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 8181 --turbopack",
+    "dev:websocket": "tsx watch src/server.ts",
+    "build": "next build",
+    "build:websocket": "tsc src/server.ts --outDir dist",
+    "start": "next start",
+    "start:websocket": "node dist/server.js",
+    "analyze": "ANALYZE=true npm run build",
+    "stripe": "stripe listen --forward-to localhost:3002/webhooks/stripe",
+    "clean": "git clean -xdf .cache .turbo dist node_modules",
+    "typecheck": "tsc --noEmit --emitDeclarationOnly false"
+  },
+  "dependencies": {
+    "@knocklabs/node": "^0.6.19",
+    "@repo/analytics": "workspace:*",
+    "@repo/api": "workspace:*",
+    "@repo/auth": "workspace:*",
+    "@repo/collaboration": "workspace:*",
+    "@repo/database": "workspace:*",
+    "@repo/design": "workspace:*",
+    "@repo/next-config": "workspace:*",
+    "@t3-oss/env-nextjs": "^0.13.4",
+    "next": "15.3.5",
+    "react": "^19.1.0",
+    "react-dom": "19.1.0",
+    "svix": "^1.64.0",
+    "tsx": "^4.19.4",
+    "zod": "^3.25.50"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "workspace:*",
+    "@types/node": "^22.15.29",
+    "@types/react": "^19.1.5",
+    "@types/react-dom": "^19.1.5",
+    "typescript": "^5.8.3"
+  }
+}
