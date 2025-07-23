@@ -7,7 +7,7 @@ type MetadataGenerator = Omit<Metadata, 'description' | 'title'> & {
   image?: string;
 };
 
-const applicationName = 'Yuba';
+const applicationName = 'Firescrape';
 
 const author: Metadata['authors'] = {
   name: 'Luke Nittmann',
@@ -15,7 +15,7 @@ const author: Metadata['authors'] = {
 };
 
 const publisher = 'Luke Nittman';
-const twitterHandle = '@lukenittman';
+const twitterHandle = '@nitt_mann';
 
 const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http';
 const productionUrl = process.env.NEXT_PUBLIC_APP_URL;
@@ -73,4 +73,3 @@ export const createMetadata = ({
 
   return metadata;
 };
-

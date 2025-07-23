@@ -4,55 +4,10 @@
 
 @plugin '@tailwindcss/typography';
 
-/* Louize Display Font */
-@font-face {
-  font-family: 'Louize Display';
-  src: url('../src/fonts/louize/LouizeDisplayTrialCnd-Regular.otf') format('opentype');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Louize Display';
-  src: url('../src/fonts/louize/LouizeDisplayTrialCnd-Medium.otf') format('opentype');
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Louize Display';
-  src: url('../src/fonts/louize/LouizeDisplayTrialCnd-Bold.otf') format('opentype');
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-
-/* CX80 Body Font */
-@font-face {
-  font-family: 'CX80';
-  src: url('../src/fonts/cx80/CX80Trial-Light.otf') format('opentype');
-  font-weight: 300;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'CX80';
-  src: url('../src/fonts/cx80/CX80Trial-Regular.otf') format('opentype');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'CX80';
-  src: url('../src/fonts/cx80/CX80Trial-Bold.otf') format('opentype');
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
+/* Firescrape Typography System - Note: Font files should be in app's public folder */
+/* These @font-face declarations are kept here for reference but actual font loading happens in app */
+/* Louize Display for branding/headers, CX80 variants for body text */
+/* Font loading happens in the app via apps/app/src/styles/fonts.css */
 
 @custom-variant dark (&:is(.dark *));
 
@@ -78,13 +33,13 @@
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
   
-  /* Nature-inspired Yuba colors */
-  --nature-green: oklch(0.62 0.16 145);
-  --nature-green-light: oklch(0.75 0.12 145);
-  --nature-green-dark: oklch(0.45 0.18 145);
-  --forest: oklch(0.35 0.12 145);
-  --sage: oklch(0.68 0.08 145);
-  --moss: oklch(0.55 0.14 145);
+  /* Fire-inspired Firescrape colors */
+  --fire-orange: oklch(0.70 0.20 40);
+  --fire-red: oklch(0.60 0.22 25);
+  --fire-yellow: oklch(0.85 0.15 85);
+  --ember: oklch(0.45 0.18 30);
+  --flame: oklch(0.75 0.21 45);
+  --spark: oklch(0.90 0.12 75);
   --chart-1: oklch(0.646 0.222 41.116);
   --chart-2: oklch(0.6 0.118 184.704);
   --chart-3: oklch(0.398 0.07 227.392);
@@ -125,13 +80,13 @@
   --input: oklch(0.269 0 0);
   --ring: oklch(0.439 0 0);
   
-  /* Nature-inspired Yuba colors (dark mode) */
-  --nature-green: oklch(0.65 0.18 145);
-  --nature-green-light: oklch(0.78 0.14 145);
-  --nature-green-dark: oklch(0.48 0.20 145);
-  --forest: oklch(0.38 0.14 145);
-  --sage: oklch(0.71 0.10 145);
-  --moss: oklch(0.58 0.16 145);
+  /* Fire-inspired Firescrape colors (dark mode) */
+  --fire-orange: oklch(0.73 0.22 40);
+  --fire-red: oklch(0.63 0.24 25);
+  --fire-yellow: oklch(0.88 0.17 85);
+  --ember: oklch(0.48 0.20 30);
+  --flame: oklch(0.78 0.23 45);
+  --spark: oklch(0.93 0.14 75);
   --chart-1: oklch(0.488 0.243 264.376);
   --chart-2: oklch(0.696 0.17 162.48);
   --chart-3: oklch(0.769 0.188 70.08);
@@ -152,8 +107,15 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-  --font-display: 'Louize Display', var(--font-geist-sans);
-  --font-body: 'CX80', var(--font-geist-sans);
+  /* Firescrape Typography System */
+  --font-display: 'Louize Display', system-ui, sans-serif;
+  --font-primary: 'TX02Mono-Regular', system-ui, monospace;
+  --font-secondary: 'TX02Mono-Regular', system-ui, monospace;
+  --font-tertiary: 'TX02Mono-Regular', system-ui, monospace;
+  
+  /* Font family utilities for Tailwind v4 */
+  --font-louize: 'Louize Display', system-ui, sans-serif;
+  --font-tx02: 'TX02Mono-Regular', system-ui, monospace;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -184,12 +146,12 @@
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
   --color-success: var(--success);
-  --color-nature-green: var(--nature-green);
-  --color-nature-green-light: var(--nature-green-light);
-  --color-nature-green-dark: var(--nature-green-dark);
-  --color-forest: var(--forest);
-  --color-sage: var(--sage);
-  --color-moss: var(--moss);
+  --color-fire-orange: var(--fire-orange);
+  --color-fire-red: var(--fire-red);
+  --color-fire-yellow: var(--fire-yellow);
+  --color-ember: var(--ember);
+  --color-flame: var(--flame);
+  --color-spark: var(--spark);
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);

@@ -1,5 +1,5 @@
 import { atom } from 'jotai';
-import type { Country } from '@/components/shared/ui/flag-picker-button';
+import type { Country } from '@/lib/constants/countries';
 
 export const mobileUserMenuOpenAtom = atom(false);
 export const mobileNotificationsOpenAtom = atom(false);
@@ -48,6 +48,12 @@ export const mobileProviderModelsDataAtom = atom<{
     onToggle: (id: string, value: boolean) => void;
 } | null>(null);
 
-// State for mobile chat overlay
-export const mobileChatOpenAtom = atom(false);
+// State for mobile scrape option submenus
+export const mobileScrapeExampleOpenAtom = atom(false);
+export const mobileScrapeExampleCallbackAtom = atom<((example: string) => void) | null>(null);
+export const mobileScrapeExampleSelectedAtom = atom<string | undefined>(undefined);
+
+export const mobileScrapeModelOpenAtom = atom(false);
+export const mobileScrapeModelCallbackAtom = atom<((model: string) => void) | null>(null);
+export const mobileScrapeModelSelectedAtom = atom<string | undefined>(undefined);
 

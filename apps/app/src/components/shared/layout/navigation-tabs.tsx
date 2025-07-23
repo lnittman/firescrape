@@ -2,31 +2,27 @@
 
 import { usePathname } from 'next/navigation';
 import { CaretLeft } from '@phosphor-icons/react/dist/ssr';
-import Link from 'next/link';
+import { Link } from 'next-view-transitions';
 import { cn } from '@repo/design/lib/utils';
 
 export function NavigationTabs() {
   const pathname = usePathname();
   
   // Only show on detail pages
-  const showBackButton = pathname.includes('/trails/') || 
-                        pathname.includes('/activities/') ||
-                        pathname.includes('/profile/');
+  const showBackButton = pathname.includes('/runs/') || 
+                        pathname.includes('/account/');
 
   if (!showBackButton) return null;
 
   const getBackLink = () => {
-    if (pathname.includes('/trails/')) return '/discover';
-    if (pathname.includes('/activities/')) return '/profile';
-    if (pathname.includes('/profile/')) return '/profile';
+    if (pathname.includes('/runs/')) return '/my-runs';
+    if (pathname.includes('/account/')) return '/';
     return '/';
   };
 
   const getTitle = () => {
-    if (pathname.includes('/trails/')) return 'Trail Details';
-    if (pathname.includes('/activities/')) return 'Activity';
-    if (pathname.includes('/profile/settings')) return 'Settings';
-    if (pathname.includes('/profile/stats')) return 'Stats';
+    if (pathname.includes('/runs/')) return 'Run Details';
+    if (pathname.includes('/account/')) return 'Account';
     return '';
   };
 

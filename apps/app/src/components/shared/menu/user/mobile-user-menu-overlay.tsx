@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useEffect, Suspense } from "react";
-import { SignOutButton, useAuth, useUser } from "@repo/auth/client";
+import React, { useEffect, Suspense } from "react";
+
 import {
     SignOut,
     ArrowUpRight,
@@ -9,14 +9,16 @@ import {
     Gear,
     Plus,
 } from "@phosphor-icons/react/dist/ssr";
-import { useTransitionRouter } from "next-view-transitions";
-import { usePathname } from "next/navigation";
-import { useAtom } from "jotai";
 import { motion, AnimatePresence } from "framer-motion";
-import { cn } from "@repo/design/lib/utils";
-import { mobileUserMenuOpenAtom, mobileChatOpenAtom } from "@/atoms/menus";
-import { searchModalOpenAtom, planTripModalOpenAtom } from "@/atoms/modals";
-import { ThemeSwitcher } from "@/components/shared/theme-switcher";
+import { useAtom } from "jotai";
+import { usePathname } from "next/navigation";
+import { useTransitionRouter } from "next-view-transitions";
+
+import { SignOutButton, useAuth, useUser } from "@repo/auth/client";
+
+import { mobileUserMenuOpenAtom } from "@/atoms/menus";
+import { searchModalOpenAtom } from "@/atoms/modals";
+import { useAutoClose } from "@/hooks/use-auto-close";
 
 interface DocLink {
     id: string;
@@ -30,46 +32,16 @@ const docLinks: DocLink[] = [
         id: '1',
         title: 'Documentation',
         description: 'Complete guide and API reference',
-        url: 'https://docs.example.com'
+        url: 'https://docs.firecrawl.dev/'
     },
     {
         id: '2',
         title: 'Changelog',
         description: 'Latest updates and releases',
-        url: 'https://changelog.example.com'
+        url: 'https://www.firecrawl.dev/changelog'
     },
-    {
-        id: '3',
-        title: 'Help Center',
-        description: 'Support articles and tutorials',
-        url: 'https://help.example.com'
-    }
 ];
 
-
-
-// Hook to auto-close mobile overlays when transitioning to desktop
-function useAutoCloseOnDesktop(isOpen: boolean, onClose: () => void) {
-    useEffect(() => {
-        if (!isOpen) return;
-
-        const handleResize = () => {
-            // Close immediately if screen becomes larger than mobile breakpoint (640px)
-            if (window.innerWidth >= 640) {
-                onClose();
-            }
-        };
-
-        window.addEventListener('resize', handleResize);
-
-        // Check immediately in case we're already on desktop
-        handleResize();
-
-        return () => {
-            window.removeEventListener('resize', handleResize);
-        };
-    }, [isOpen, onClose]);
-}
 
 // Main mobile user menu overlay content component
 function MobileUserMenuOverlayContent() {
@@ -78,12 +50,10 @@ function MobileUserMenuOverlayContent() {
     const router = useTransitionRouter();
     const pathname = usePathname();
     const [isOpen, setIsOpen] = useAtom(mobileUserMenuOpenAtom);
-    const [isMobileChatOpen, setIsMobileChatOpen] = useAtom(mobileChatOpenAtom);
     const [, setSearchModalOpen] = useAtom(searchModalOpenAtom);
-    const [, setPlanTripModalOpen] = useAtom(planTripModalOpenAtom);
 
     // Auto-close when transitioning to desktop
-    useAutoCloseOnDesktop(isOpen, setIsOpen.bind(null, false));
+    useAutoClose(isOpen, () => setIsOpen(false));
 
 
     // Close overlay when navigating to a new page
@@ -106,13 +76,13 @@ function MobileUserMenuOverlayContent() {
     // Navigate to settings page
     const handleOpenSettings = () => {
         setIsOpen(false);
-        router.push('/account/settings');
+        router.push('/settings');
     };
 
-    // Navigate to dashboard
+    // Navigate to Firecrawl dashboard
     const handleOpenDashboard = () => {
         setIsOpen(false);
-        router.push('/');
+        window.open('https://www.firecrawl.dev/app', '_blank', 'noopener,noreferrer');
     };
 
 
@@ -131,9 +101,9 @@ function MobileUserMenuOverlayContent() {
     };
 
     const handleHomePageClick = () => {
-        // Navigate to home page
+        // Navigate to Firecrawl home page
         setIsOpen(false);
-        router.push('/');
+        window.open('https://firecrawl.dev', '_blank', 'noopener,noreferrer');
     };
 
     // Close on backdrop click
@@ -151,16 +121,19 @@ function MobileUserMenuOverlayContent() {
         <AnimatePresence>
             {isOpen && (
                 <>
-                    {/* Full page solid overlay - positioned below header but covers tabs */}
+                    {/* Backdrop - fade the layout but keep header visible */}
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        transition={{ duration: 0.3, ease: "easeInOut" }}
-                        className="fixed inset-x-0 bottom-0 top-14 z-[70] bg-background"
+                        transition={{
+                            duration: 0.4,
+                            ease: [0.23, 1, 0.32, 1]
+                        }}
+                        className="fixed inset-0 top-14 bg-background z-[40]"
                         onClick={handleBackdropClick}
                     />
-
+                    
                     {/* Menu content - positioned from top for finger friendliness */}
                     <motion.div
                         initial={{ opacity: 0 }}
@@ -168,19 +141,21 @@ function MobileUserMenuOverlayContent() {
                         exit={{ opacity: 0 }}
                         transition={{
                             duration: 0.4,
-                            ease: [0.23, 1, 0.32, 1],
-                            delay: 0.1
+                            ease: [0.23, 1, 0.32, 1]
                         }}
-                        className="fixed left-4 right-4 top-14 bottom-4 z-[71] font-mono overflow-hidden"
+                        className="fixed left-4 right-4 top-14 bottom-4 z-[80] font-mono overflow-hidden"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="h-full w-full overflow-y-auto overscroll-contain scrollbar-hide">
                             <div className="space-y-4 p-1 pt-3">
                                 {/* Primary action buttons - made smaller */}
                                 <div className="space-y-2">
-                                    {/* Upgrade to Pro */}
-                                    <button className="w-full bg-foreground text-background hover:bg-foreground/90 transition-all duration-200 rounded-xl px-4 py-3 text-sm font-medium select-none">
-                                        Upgrade to Pro
+                                    {/* Upgrade Plan */}
+                                    <button 
+                                        onClick={() => window.open('https://www.firecrawl.dev/pricing', '_blank', 'noopener,noreferrer')}
+                                        className="w-full bg-foreground text-background hover:bg-foreground/90 transition-all duration-200 rounded-xl px-4 py-3 text-sm font-medium select-none"
+                                    >
+                                        Upgrade Plan
                                     </button>
 
                                     {/* Contact button */}
@@ -228,16 +203,6 @@ function MobileUserMenuOverlayContent() {
                                         <Gear className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors duration-200" weight="duotone" />
                                     </button>
 
-                                    <button
-                                        onClick={() => {
-                                            // Keep user menu open - plan trip modal will layer on top
-                                            setPlanTripModalOpen(true);
-                                        }}
-                                        className="w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 hover:bg-muted/30 text-sm group select-none"
-                                    >
-                                        <span className="text-muted-foreground group-hover:text-foreground transition-colors duration-200">Plan Trip</span>
-                                        <Plus className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors duration-200" weight="duotone" />
-                                    </button>
 
                                     <button
                                         onClick={() => {
@@ -250,11 +215,6 @@ function MobileUserMenuOverlayContent() {
                                         <kbd className="text-xs bg-background text-foreground border border-border px-2 py-1 rounded transition-all duration-200">⌘K</kbd>
                                     </button>
 
-                                    {/* Theme selector */}
-                                    <div className="flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 group">
-                                        <span className="text-sm text-muted-foreground group-hover:text-foreground transition-colors duration-200">Theme</span>
-                                        <ThemeSwitcher />
-                                    </div>
 
                                     {/* Sign out button */}
                                     <SignOutButton>
@@ -284,8 +244,8 @@ function MobileUserMenuOverlayContent() {
                                         onClick={handleHomePageClick}
                                         className="w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 hover:bg-muted/30 text-sm group select-none"
                                     >
-                                        <span className="text-muted-foreground group-hover:text-foreground transition-colors duration-200">Home page</span>
-                                        <House className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-all duration-200" weight="duotone" />
+                                        <span className="text-muted-foreground group-hover:text-foreground transition-colors duration-200">Home Page</span>
+                                        <span className="text-base">🔥</span>
                                     </button>
                                 </div>
 

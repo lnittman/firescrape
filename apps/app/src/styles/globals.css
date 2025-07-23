@@ -1,19 +1,13 @@
 @import '@repo/design/styles/globals.css';
+@import './fonts.css';
 
 /* 
- * YUBA TYPOGRAPHY SYSTEM - Technical Outdoor Aesthetic
+ * FIRESCRAPE TYPOGRAPHY SYSTEM
  * 
- * Body Text: CX80-0 (clean technical) - GPS devices, weather stations
- * UI Elements: CX80-1 (subtle tech) - gear specs, navigation
- * Specifications: CX80-2 (technical) - measurements, ratings
- * Annotations: CX80-3 (stylized) - special callouts
- * Display/Titles: Louize Display - mystical outdoor vibes
+ * Display: Louize Display - For branding and main headers
+ * Body/UI: TX02Mono-Regular - Clean monospace for all text
  * 
- * Alternative technical fonts:
- * - Milling: Precision engineering feel (carabiner specs)
- * - KMR Apparat: German technical equipment aesthetic
- * 
- * Usage: Apply .font-tech-body, .font-tech-ui, .font-tech-spec classes
+ * Usage: Apply .font-display, .font-primary, .font-secondary, .font-tertiary classes
  */
 
 /* Custom Fonts */
@@ -62,10 +56,6 @@
   src: url('https://intdev-global.s3.us-west-2.amazonaws.com/public/internet-dev/6c8ad1f3-2ad9-44a9-88db-46ff3f19c4f3.woff') format('woff');
 }
 
-@font-face {
-  font-family: 'TX02Mono-Regular';
-  src: url('https://intdev-global.s3.us-west-2.amazonaws.com/public/internet-dev/e049dfb6-9c5d-4ac4-97c2-eb6e95c61d09.woff2') format('woff2');
-}
 
 /* Sacred-inspired terminal aesthetic enhancements */
 @layer base {
@@ -84,34 +74,29 @@
     --glow-strength: 0.5;
     --scan-line-opacity: 0.03;
 
-    /* Technical fonts for gorp-core aesthetic */
-    --font-mono: 'IosevkaTerm-Regular', 'GeistMono-Regular', Consolas, monaco, monospace;
-    --font-body: 'CX80-0', 'CX80', var(--font-geist-sans), system-ui, sans-serif;
-    --font-display: 'Louize Display', var(--font-geist-sans), system-ui, sans-serif;
-    
-    /* CX80 Variants Guide:
-       CX80-0: Clean/minimal - best for body text
-       CX80-1: Subtle technical details - good for UI elements
-       CX80-2: More technical features - callouts/specs
-       CX80-3: Most stylized - special annotations
-    */
+    /* Firescrape Typography System */
+    --font-mono: 'TX02Mono-Regular', 'IosevkaTerm-Regular', 'GeistMono-Regular', Consolas, monaco, monospace;
+    --font-display: 'Louize Display', var(--font-geist-sans), system-ui, sans-serif; /* Brand/Headers */
+    --font-primary: 'TX02Mono-Regular', system-ui, monospace; /* All body text */
+    --font-secondary: 'TX02Mono-Regular', system-ui, monospace; /* Body/UI */
+    --font-tertiary: 'TX02Mono-Regular', system-ui, monospace; /* Accents/Special */
   }
   
-  /* Monospace grid alignment */
+  /* Default body font - using TX02Mono-Regular for clean monospace text */
   body {
     line-height: var(--line-height);
-    font-feature-settings: "kern" 0, "liga" 0, "calt" 0;
-    font-family: var(--font-mono);
+    font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+    font-family: var(--font-secondary);
   }
 
-  /* Apply font family to all elements EXCEPT Clerk Elements - exclude any element with cl- class or data-clerk attribute */
+  /* Apply TX02 font family to all elements EXCEPT Clerk Elements */
   *:not([class*="cl-"]):not([data-clerk]):not([id*="clerk"]), 
   *:not([class*="cl-"]):not([data-clerk]):not([id*="clerk"])::before, 
   *:not([class*="cl-"]):not([data-clerk]):not([id*="clerk"])::after {
-    font-family: var(--font-mono);
+    font-family: var(--font-secondary);
   }
   
-  /* Apply font-mono class with more specific selectors */
+  /* Apply monospace font when explicitly requested */
   .font-mono:not([class*="cl-"]):not([data-clerk]),
   button.font-mono:not([class*="cl-"]):not([data-clerk]),
   input.font-mono:not([class*="cl-"]):not([data-clerk]),
@@ -121,26 +106,37 @@
   span.font-mono:not([class*="cl-"]):not([data-clerk]),
   div.font-mono:not([class*="cl-"]):not([data-clerk]),
   p.font-mono:not([class*="cl-"]):not([data-clerk]),
-  h1.font-mono:not([class*="cl-"]):not([data-clerk]),
-  h2.font-mono:not([class*="cl-"]):not([data-clerk]),
-  h3.font-mono:not([class*="cl-"]):not([data-clerk]),
-  h4.font-mono:not([class*="cl-"]):not([data-clerk]),
-  h5.font-mono:not([class*="cl-"]):not([data-clerk]),
-  h6.font-mono:not([class*="cl-"]):not([data-clerk]) {
+  code, pre {
     font-family: var(--font-mono) !important;
   }
-
-  /* Exception: Keep logo with fixed TX02 Mono font */
-  .yuba-logo-fixed-font,
-  .yuba-logo-fixed-font *,
-  pre.yuba-logo-fixed-font {
-    font-family: 'TX02Mono-Regular', Consolas, monaco, monospace !important;
+  
+  /* Apply Louize to h1, TX02 to other headings */
+  h1:not([class*="cl-"]):not([data-clerk]) {
+    font-family: var(--font-display) !important;
+    font-weight: 500;
+  }
+  
+  h2:not([class*="cl-"]):not([data-clerk]),
+  h3:not([class*="cl-"]):not([data-clerk]),
+  h4:not([class*="cl-"]):not([data-clerk]),
+  h5:not([class*="cl-"]):not([data-clerk]),
+  h6:not([class*="cl-"]):not([data-clerk]) {
+    font-family: var(--font-primary) !important;
+    font-weight: 400;
   }
 
-  /* Unauthenticated pages use CX80-0 (cleanest variant) for that technical outdoor gear aesthetic */
+  /* Exception: Keep logo with Louize font */
+  .firescrape-logo-fixed-font,
+  .firescrape-logo-fixed-font *,
+  pre.firescrape-logo-fixed-font {
+    font-family: var(--font-display) !important;
+    font-weight: 500;
+  }
+
+  /* Unauthenticated pages use TX02 for clean monospace aesthetic */
   /* Carefully exclude Clerk Elements to prevent form breakage */
   .unauthenticated-layout {
-    font-family: 'CX80-0', 'CX80', var(--font-geist-sans), system-ui, sans-serif;
+    font-family: 'TX02Mono-Regular', system-ui, monospace;
   }
   
   /* Apply to specific elements, excluding Clerk's form elements */
@@ -150,45 +146,81 @@
   .unauthenticated-layout h3:not([class*="cl-"]):not([data-clerk]),
   .unauthenticated-layout span:not([class*="cl-"]):not([data-clerk]):not(.font-display),
   .unauthenticated-layout div:not([class*="cl-"]):not([data-clerk]):not(.font-display) {
-    font-family: 'CX80-0', 'CX80', var(--font-geist-sans), system-ui, sans-serif;
+    font-family: 'TX02Mono-Regular', system-ui, monospace;
   }
   
-  /* Louize Display for mystical titles and branding */
+  /* Display font for branding and main headers */
   .font-display,
   .font-display * {
-    font-family: 'Louize Display', var(--font-geist-sans), system-ui, sans-serif !important;
-    font-weight: 500; /* Medium weight for better presence */
-    letter-spacing: -0.02em; /* Tighten slightly for display */
+    font-family: var(--font-display) !important;
+    font-weight: 500;
+    letter-spacing: -0.02em;
   }
 
-  /* Technical outdoor gear typography utilities */
-  .font-tech-body {
-    font-family: 'CX80-0', 'CX80', var(--font-geist-sans), system-ui, sans-serif;
+  /* Primary font for secondary headers */
+  .font-primary,
+  .font-primary * {
+    font-family: var(--font-primary) !important;
+    font-weight: 400;
   }
 
-  .font-tech-ui {
-    font-family: 'CX80-1', 'CX80', var(--font-geist-sans), system-ui, sans-serif;
+  /* Secondary font for body text and UI */
+  .font-secondary,
+  .font-secondary * {
+    font-family: var(--font-secondary) !important;
   }
 
-  .font-tech-spec {
-    font-family: 'CX80-2', 'CX80', var(--font-geist-sans), system-ui, sans-serif;
-    letter-spacing: 0.02em;
-    text-transform: uppercase;
+  /* Tertiary font for special accents */
+  .font-tertiary,
+  .font-tertiary * {
+    font-family: var(--font-tertiary) !important;
+  }
+
+  /* Display text styles */
+  .display-hero {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+  }
+
+  .display-title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: clamp(2rem, 4vw, 3rem);
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+
+  /* Body text styles */
+  .body-large {
+    font-family: var(--font-secondary);
+    font-size: 1.125rem;
+    line-height: 1.6;
+  }
+
+  .body-regular {
+    font-family: var(--font-secondary);
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+
+  /* UI text styles */
+  .ui-label {
+    font-family: var(--font-secondary);
+    font-weight: 500;
     font-size: 0.875rem;
-  }
-
-  .font-tech-annotation {
-    font-family: 'CX80-3', 'CX80', var(--font-geist-sans), system-ui, sans-serif;
-  }
-
-  /* Alternative technical fonts for variety */
-  .font-milling {
-    font-family: 'Milling Simplex 0.5mm', 'CX80-1', var(--font-mono);
     letter-spacing: 0.01em;
   }
 
-  .font-apparat {
-    font-family: 'KMR Apparat', 'CX80-0', var(--font-geist-sans), system-ui, sans-serif;
+  /* Special accent styles */
+  .accent-badge {
+    font-family: var(--font-tertiary);
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
   }
 
   /* Font selection classes */
@@ -396,13 +428,16 @@
 }
 
 /* HIGHEST PRIORITY: Logo font override - must be at the very end */
-html .yuba-logo-fixed-font,
-html .yuba-logo-fixed-font *,
-html pre.yuba-logo-fixed-font,
-body .yuba-logo-fixed-font,
-body .yuba-logo-fixed-font *,
-body pre.yuba-logo-fixed-font {
-  font-family: 'TX02Mono-Regular', Consolas, monaco, monospace !important;
+html .firescrape-logo-fixed-font,
+html .firescrape-logo-fixed-font *,
+html pre.firescrape-logo-fixed-font,
+body .firescrape-logo-fixed-font,
+body .firescrape-logo-fixed-font *,
+body pre.firescrape-logo-fixed-font,
+.unauthenticated-layout .firescrape-logo-fixed-font,
+.unauthenticated-layout .firescrape-logo-fixed-font * {
+  font-family: var(--font-display) !important;
+  font-weight: 500 !important;
 }
 
 /* Hide ONLY the default shadcn Dialog close button when using custom close button */

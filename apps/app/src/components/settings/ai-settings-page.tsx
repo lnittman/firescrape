@@ -1,72 +1,57 @@
 "use client";
 
 import React, { useState } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import { Brain, Info, Sparkle } from "@phosphor-icons/react/dist/ssr";
+import { useAISettings } from "@/hooks/swr/user/queries";
+import { useUpdateAISettings } from "@/hooks/swr/user/mutations";
+import type { AISettings } from "@/lib/api/schemas";
 import { MobileSettingsHeader } from "./mobile-settings-header";
-import { Button } from "@repo/design/components/ui/button";
-import { Textarea } from "@repo/design/components/ui/textarea";
-import { Label } from "@repo/design/components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@repo/design/components/ui/card";
-import { toast } from "@repo/design/components/ui/sonner";
-import { Lightbulb, ChatCircle, User } from "@phosphor-icons/react";
 
-const aiSettingsSchema = z.object({
-  rules: z
-    .string()
-    .max(2000, "Rules must be less than 2000 characters")
-    .optional(),
-});
+interface AISettingsPageProps {
+  initialSettings?: AISettings;
+}
 
-type AISettingsForm = z.infer<typeof aiSettingsSchema>;
+export function AISettingsPage({ initialSettings }: AISettingsPageProps) {
+  const { settings, isLoading } = useAISettings(initialSettings);
+  const { updateAISettings, isLoading: isUpdating } = useUpdateAISettings();
+  
+  const [rules, setRules] = useState(settings?.rules || "");
+  const [hasChanges, setHasChanges] = useState(false);
 
-export function AISettingsPage() {
-  const [isLoading, setIsLoading] = useState(false);
+  // Use initial data from RSC if available, otherwise fall back to SWR
+  const effectiveSettings = settings || initialSettings;
 
-  const {
-    register,
-    handleSubmit,
-    watch,
-    formState: { errors, isDirty },
-  } = useForm<AISettingsForm>({
-    resolver: zodResolver(aiSettingsSchema),
-    defaultValues: {
-      rules: "",
-    },
-  });
+  React.useEffect(() => {
+    if (effectiveSettings?.rules !== undefined) {
+      setRules(effectiveSettings.rules || "");
+    }
+  }, [effectiveSettings]);
 
-  const rulesValue = watch("rules") || "";
-  const characterCount = rulesValue.length;
+  React.useEffect(() => {
+    setHasChanges(rules !== (effectiveSettings?.rules || ""));
+  }, [rules, effectiveSettings?.rules]);
 
-  const onSubmit = async (data: AISettingsForm) => {
-    setIsLoading(true);
+  const handleSave = async () => {
     try {
-      // TODO: Implement API call to save AI settings
-      console.log("Saving AI settings:", data);
-
-      toast.success("AI settings updated successfully");
+      await updateAISettings({ rules: rules.trim() || undefined });
+      setHasChanges(false);
     } catch (error) {
-      console.error("Failed to update AI settings:", error);
-      toast.error("Failed to update settings. Please try again.");
-    } finally {
-      setIsLoading(false);
+      console.error("Failed to save AI settings:", error);
     }
   };
 
-  const exampleRules = [
-    "I prefer detailed trail descriptions with specific landmarks",
-    "Always mention water sources and restroom availability",
-    "I have knee issues, so suggest easier alternatives for steep descents",
-    "I love photography, so highlight scenic viewpoints",
-    "I usually hike with my dog, so mention dog-friendly trails",
-  ];
+  if (isLoading && !initialSettings) {
+    return (
+      <div className="space-y-6">
+        <MobileSettingsHeader title="AI Settings" />
+        <div className="animate-pulse px-6">
+          <div className="h-6 bg-muted rounded w-1/3 mb-2"></div>
+          <div className="h-4 bg-muted rounded w-2/3 mb-4"></div>
+          <div className="h-32 bg-muted rounded"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -77,109 +62,94 @@ export function AISettingsPage() {
       <div className="hidden sm:block space-y-2 px-6 pt-6">
         <h1 className="text-xl font-semibold">AI Settings</h1>
         <p className="text-muted-foreground">
-          Customize how Yuba provides recommendations and interacts with you
+          Configure custom rules and preferences for AI-powered scraping
         </p>
       </div>
 
-      <div className="px-6 pb-6 space-y-6">
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          {/* AI Rules Card */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <ChatCircle className="w-5 h-5" />
-                Personal Preferences
-              </CardTitle>
-              <CardDescription>
-                Tell Yuba about your hiking style, preferences, and any specific
-                needs. This helps provide more personalized trail
-                recommendations and advice.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="rules">Your Hiking Preferences & Needs</Label>
-                <Textarea
-                  id="rules"
-                  placeholder="Tell me about your hiking preferences, fitness level, any physical limitations, favorite types of scenery, or specific things you'd like me to always consider when making recommendations..."
-                  className="min-h-[120px] resize-none"
-                  {...register("rules")}
-                />
-                <div className="flex justify-between text-xs text-muted-foreground">
-                  <span>
-                    {errors.rules ? (
-                      <span className="text-destructive">
-                        {errors.rules.message}
-                      </span>
-                    ) : (
-                      "Help Yuba understand your outdoor preferences"
-                    )}
-                  </span>
-                  <span
-                    className={characterCount > 1800 ? "text-destructive" : ""}
-                  >
-                    {characterCount}/2000
-                  </span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+      <div className="space-y-6 px-6 pb-6">
+        {/* Custom Rules */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-3">
+            <Brain
+              size={16}
+              weight="duotone"
+              className="text-muted-foreground"
+            />
+            <h3 className="text-sm font-medium font-mono">Custom Rules</h3>
+          </div>
 
-          {/* Examples Card */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Lightbulb className="w-5 h-5" />
-                Example Preferences
-              </CardTitle>
-              <CardDescription>
-                Here are some examples of helpful preferences you might want to
-                share
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-2">
-                {exampleRules.map((example, index) => (
-                  <li
-                    key={index}
-                    className="flex items-start gap-2 text-sm text-muted-foreground"
-                  >
-                    <span className="text-primary mt-1">•</span>
-                    <span>{example}</span>
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
-
-          {/* Privacy Notice */}
-          <Card className="border-border/50">
-            <CardContent className="pt-6">
+          <div className="space-y-4">
+            <div className="bg-accent/30 border border-border rounded-lg p-4">
               <div className="flex items-start gap-3">
-                <User className="w-5 h-5 text-muted-foreground mt-0.5" />
-                <div className="text-sm text-muted-foreground space-y-1">
-                  <p className="font-medium">Privacy & Data</p>
-                  <p>
-                    Your preferences help Yuba provide better recommendations.
-                    This information is stored securely and only used to
-                    personalize your experience.
+                <Info
+                  size={16}
+                  weight="duotone"
+                  className="text-blue-600 mt-0.5 flex-shrink-0"
+                />
+                <div className="space-y-2">
+                  <h4 className="text-sm font-medium">AI-Powered Extraction</h4>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    Set custom rules to help the AI understand what content you want to extract.
+                    For example: "Focus on product descriptions and prices" or "Extract only article text, ignore navigation".
                   </p>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
 
-          {/* Submit Button */}
-          <div className="flex justify-end">
-            <Button
-              type="submit"
-              disabled={!isDirty || isLoading}
-              className="min-w-[120px]"
-            >
-              {isLoading ? "Saving..." : "Save Changes"}
-            </Button>
+            <div className="space-y-3">
+              <label className="text-sm font-medium text-foreground">
+                Extraction Rules
+              </label>
+              <textarea
+                value={rules}
+                onChange={(e) => setRules(e.target.value)}
+                placeholder="Describe what content you want the AI to focus on when scraping pages..."
+                className="w-full h-32 px-3 py-2 bg-background border border-border hover:border-foreground/20 focus:border-foreground/30 focus:outline-none focus:ring-2 focus:ring-foreground/20 text-sm transition-colors rounded-lg resize-none"
+                style={{ fontSize: '16px' }} // Prevent zoom on iOS
+              />
+              <p className="text-xs text-muted-foreground">
+                These rules will be applied to all your scraping requests to help the AI extract more relevant content.
+              </p>
+            </div>
+
+            {hasChanges && (
+              <div className="flex justify-end">
+                <button
+                  onClick={handleSave}
+                  disabled={isUpdating}
+                  className="flex items-center gap-2 px-4 py-2 bg-foreground text-background hover:bg-foreground/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-sm rounded-lg h-10"
+                >
+                  {isUpdating ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-background/30 border-t-background rounded-full animate-spin" />
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkle size={14} weight="duotone" />
+                      Save Rules
+                    </>
+                  )}
+                </button>
+              </div>
+            )}
           </div>
-        </form>
+        </div>
+
+        {/* Future AI Features */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-3">
+            <div className="w-4 h-4 rounded border border-dashed border-muted-foreground/50"></div>
+            <h3 className="text-sm font-medium font-mono text-muted-foreground">
+              More AI Features Coming Soon
+            </h3>
+          </div>
+          <div className="border border-dashed border-muted-foreground/30 rounded-lg p-4">
+            <p className="text-xs text-muted-foreground text-center">
+              Advanced AI features like custom extraction models and intelligent content filtering will be available in future updates.
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );

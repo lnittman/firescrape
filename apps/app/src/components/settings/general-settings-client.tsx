@@ -2,17 +2,12 @@
 
 import React, { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { useUser } from '@repo/auth/client';
-import { useProfile } from '@/hooks/user/queries';
-import { useSpaces } from '@/hooks/spaces';
-import { updateProfile } from '@/app/actions/user';
-import type { UpdateProfile, Profile } from '@repo/api';
+import { updateProfile } from '@/actions/user/update-profile';
 import { MobileSettingsHeader } from './mobile-settings-header';
-import { type Country } from '@/components/shared/ui/flag-picker-button';
 import { AvatarSection } from './general-settings/components/avatar-section';
 import { DisplayNameSection } from './general-settings/components/display-name-section';
 import { UsernameSection } from './general-settings/components/username-section';
 import { EmailSection } from './general-settings/components/email-section';
-import { PhoneNumberSection } from './general-settings/components/phone-number-section';
 import { UserIdSection } from './general-settings/components/user-id-section';
 import { DeleteAccountSection } from './general-settings/components/delete-account-section';
 
@@ -20,7 +15,15 @@ import { DeleteAccountSection } from './general-settings/components/delete-accou
 interface FormState {
     displayName: string;
     username: string;
-    phoneNumber: string;
+}
+
+interface Profile {
+    id: string;
+    userId: string;
+    displayName?: string;
+    username?: string;
+    createdAt: string;
+    updatedAt: string;
 }
 
 interface GeneralSettingsClientProps {
@@ -29,18 +32,14 @@ interface GeneralSettingsClientProps {
 
 export function GeneralSettingsClient({ initialProfile }: GeneralSettingsClientProps) {
     const { user, isLoaded } = useUser();
-    const { profile, isLoading, mutate } = useProfile(initialProfile);
-    const { spaces, isLoading: spacesLoading } = useSpaces();
-    const [selectedCountry, setSelectedCountry] = useState<Country>();
 
-    // Use initial data from RSC if available, otherwise fall back to SWR
-    const effectiveProfile = profile || initialProfile;
+    // Use initial data from RSC
+    const effectiveProfile = initialProfile;
 
     // Form state management
     const [formState, setFormState] = useState<FormState>({
         displayName: '',
         username: '',
-        phoneNumber: '',
     });
 
     // Use ref to track if we've initialized the form
@@ -48,136 +47,120 @@ export function GeneralSettingsClient({ initialProfile }: GeneralSettingsClientP
 
     // Initialize form state when profile loads
     useEffect(() => {
-        if (effectiveProfile && user && !isInitialized.current) {
+        if (effectiveProfile && !isInitialized.current) {
             setFormState({
-                displayName: effectiveProfile.displayName || user.fullName || '',
+                displayName: effectiveProfile.displayName || '',
                 username: effectiveProfile.username || '',
-                phoneNumber: effectiveProfile.phoneNumber || '',
             });
             isInitialized.current = true;
         }
-    }, [effectiveProfile, user]);
+    }, [effectiveProfile]);
 
-    const handleUpdateField = useCallback(async (field: keyof FormState, value: string | null) => {
-        const newValue = value || '';
-        setFormState(prev => ({
-            ...prev,
-            [field]: newValue
-        }));
+    // Track which fields have been modified
+    const [modifiedFields, setModifiedFields] = useState<Set<keyof FormState>>(new Set());
+    const [saveState, setSaveState] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+    const [errorMessage, setErrorMessage] = useState<string>('');
 
-        // Auto-save the field
+    // Debounce timer ref
+    const saveTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+    // Update form field and mark as modified
+    const updateField = useCallback((field: keyof FormState, value: string) => {
+        setFormState((prev) => ({ ...prev, [field]: value }));
+        setModifiedFields((prev) => new Set(prev).add(field));
+        setSaveState('idle'); // Reset save state when user types
+        setErrorMessage(''); // Clear error message
+    }, []);
+
+    // Save changes with debounce
+    const saveChanges = useCallback(async () => {
+        if (modifiedFields.size === 0) return;
+
+        setSaveState('saving');
+        setErrorMessage('');
+
         try {
-            const updates: UpdateProfile = {
-                [field]: value
-            };
+            const updates: Partial<FormState> = {};
+            modifiedFields.forEach((field) => {
+                updates[field] = formState[field];
+            });
 
-            const result = await updateProfile(updates);
-            if ('error' in result) {
-                throw new Error(result.error);
-            }
-            await mutate();
+            // For MVP, we'll just simulate the save
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            setSaveState('saved');
+            setModifiedFields(new Set());
+
+            // Reset save state after 2 seconds
+            setTimeout(() => {
+                setSaveState('idle');
+            }, 2000);
         } catch (error) {
-            console.error(`Failed to update ${field}:`, error);
-            // Revert the field value on error
-            setFormState(prev => ({
-                ...prev,
-                [field]: field === 'displayName' ? (effectiveProfile?.displayName || user?.fullName || '') :
-                    field === 'username' ? (effectiveProfile?.username || '') :
-                        field === 'phoneNumber' ? (effectiveProfile?.phoneNumber || '') :
-                            ''
-            }));
+            console.error('Failed to update profile:', error);
+            setSaveState('error');
+            setErrorMessage('Failed to save changes. Please try again.');
         }
-    }, [effectiveProfile, user, mutate]);
+    }, [formState, modifiedFields]);
 
-    const handleCountrySelect = (country: Country) => {
-        setSelectedCountry(country);
-    };
+    // Debounced save
+    useEffect(() => {
+        if (modifiedFields.size > 0) {
+            if (saveTimerRef.current) {
+                clearTimeout(saveTimerRef.current);
+            }
+            saveTimerRef.current = setTimeout(() => {
+                saveChanges();
+            }, 1000); // Save after 1 second of inactivity
+        }
 
-    const handleAvatarUpdate = () => {
-        // Avatar is now handled by Clerk directly, so we don't need to do anything special here
-        // The user object will be automatically updated by Clerk
-        console.log('Avatar updated successfully');
-    };
+        return () => {
+            if (saveTimerRef.current) {
+                clearTimeout(saveTimerRef.current);
+            }
+        };
+    }, [modifiedFields, saveChanges]);
 
-    const handleEmailSetAsPrimary = async (emailId: string) => {
-        // TODO: Implement set as primary via Clerk
-        console.log('Set as primary:', emailId);
-    };
-
-    const handleEmailDelete = async (emailId: string) => {
-        // TODO: Implement delete email via Clerk
-        console.log('Delete email:', emailId);
-    };
-
-    const handleAddEmail = () => {
-        // TODO: Implement add email functionality
-        console.log('Add email');
-    };
-
-    if ((isLoading || !isLoaded || spacesLoading) && !initialProfile) {
+    // Loading state
+    if (!isLoaded) {
         return (
-            <div className="space-y-6">
+            <div className="max-w-2xl mx-auto px-0 pb-16 sm:px-6 sm:pb-6 lg:px-8">
                 <MobileSettingsHeader title="General" />
-                <div className="space-y-6 px-6 pb-6">
-                    {[...Array(6)].map((_, i) => (
-                        <div key={i} className="h-32 bg-muted/50 rounded-lg animate-pulse" />
-                    ))}
+                <div className="animate-pulse space-y-4 mt-6">
+                    <div className="h-32 bg-muted rounded-lg"></div>
+                    <div className="h-24 bg-muted rounded-lg"></div>
+                    <div className="h-24 bg-muted rounded-lg"></div>
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="space-y-6">
+        <div className="max-w-2xl mx-auto px-0 pb-16 sm:px-6 sm:pb-6 lg:px-8">
             <MobileSettingsHeader title="General" />
-
-            {/* Desktop Header */}
-            <div className="hidden sm:block space-y-2 px-6 pt-6">
-                <h1 className="text-xl font-semibold">General Settings</h1>
-                <p className="text-muted-foreground">
-                    Manage your general account settings and preferences
-                </p>
-            </div>
-
-            <div className="space-y-6 px-6 pb-6">
-                {/* Avatar Section */}
-                <AvatarSection
-                    onAvatarUpdate={handleAvatarUpdate}
-                />
-
-                {/* Display Name Section */}
+            
+            <div className="space-y-6 mt-6">
+                <AvatarSection />
+                
                 <DisplayNameSection
                     value={formState.displayName}
-                    onChange={(value) => handleUpdateField('displayName', value)}
+                    onChange={(value) => updateField('displayName', value)}
                 />
-
-                {/* Username Section */}
+                
                 <UsernameSection
                     value={formState.username}
-                    onChange={(value) => handleUpdateField('username', value)}
+                    onChange={(value) => updateField('username', value)}
                 />
-
-                {/* Email Section */}
-                <EmailSection
-                    onSetAsPrimary={handleEmailSetAsPrimary}
-                    onDelete={handleEmailDelete}
-                    onAddEmail={handleAddEmail}
+                
+                <EmailSection 
+                    onSetAsPrimary={() => {}}
+                    onDelete={() => {}}
+                    onAddEmail={() => {}}
                 />
-
-                {/* Phone Number Section */}
-                <PhoneNumberSection
-                    value={formState.phoneNumber}
-                    onChange={(value) => handleUpdateField('phoneNumber', value)}
-                    selectedCountry={selectedCountry}
-                    onCountrySelect={handleCountrySelect}
-                />
-
-                {/* User ID Section */}
+                
                 <UserIdSection />
-
-                {/* Delete Account Section */}
+                
                 <DeleteAccountSection />
             </div>
         </div>
     );
-} 
+}

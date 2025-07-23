@@ -3,7 +3,6 @@
 import React, { Suspense } from "react";
 import { useAtom } from "jotai";
 import {
-    ArrowLeft,
     Bug,
     Sparkle,
     Smiley,
@@ -51,23 +50,12 @@ function MobileFeedbackTypeMenuContent() {
             isOpen={isOpen}
             onClose={handleClose}
             title="Feedback Type"
-            showCloseButton={false}
+            showBackButton={true}
+            onBack={handleClose}
             position="bottom"
             spacing="sm"
+            isSubsheet={true}
         >
-            {/* Back button */}
-            <button
-                onClick={handleClose}
-                className={cn(
-                    "absolute top-4 left-6 z-10 h-8 w-8 bg-transparent text-muted-foreground flex items-center justify-center rounded-full border border-border transition-all duration-200",
-                    "hover:bg-accent hover:text-foreground hover:border-foreground/20",
-                    "focus:outline-none"
-                )}
-                aria-label="Back"
-            >
-                <ArrowLeft className="w-4 h-4" weight="duotone" />
-            </button>
-
             <div className="p-4 space-y-1">
                 {feedbackTopics.map((topic) => (
                     <button

@@ -5,7 +5,7 @@ import { useAtom } from "jotai";
 import { CaretDown } from "@phosphor-icons/react/dist/ssr";
 import { cn } from "@repo/design/lib/utils";
 import { Skeleton } from "@repo/design/components/ui/skeleton";
-import type { Country } from "@/components/shared/ui/flag-picker-button";
+import type { Country } from "@/lib/constants/countries";
 import {
     mobileCountryPickerOpenAtom,
     mobileCountryPickerCallbackAtom,

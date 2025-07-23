@@ -3,7 +3,6 @@
 import React from 'react';
 import { ErrorBoundary as ReactErrorBoundary } from 'react-error-boundary';
 import { Button } from '@repo/design/components/ui/button';
-import { parseError } from '@repo/observability/error';
 
 interface ErrorFallbackProps {
   error: Error;
@@ -62,7 +61,7 @@ export function ErrorBoundary({
       FallbackComponent={fallback || DefaultErrorFallback}
       onError={(error, errorInfo) => {
         console.error('Error boundary caught:', error);
-        parseError(error);
+        console.error('Error caught by boundary:', error);
         onError?.(error, errorInfo);
       }}
       resetKeys={resetKeys}

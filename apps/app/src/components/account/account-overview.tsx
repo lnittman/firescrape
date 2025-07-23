@@ -5,29 +5,24 @@ import { useUser } from "@repo/auth/client";
 import {
   useProfile,
   useAISettings,
-  useAppearanceSettings,
-} from "@/hooks/user/queries";
+} from "@/hooks/swr/user/queries";
 import { cn } from "@repo/design/lib/utils";
-import { SPACE_DEFAULTS } from "@repo/api";
 import {
   User,
-  Mountains,
-  MapPin,
+  Globe,
+  Database,
   Clock,
-  Palette,
+  Brain,
   Calendar,
-  Footprints,
+  Fire,
 } from "@phosphor-icons/react/dist/ssr";
-// Removed space constants - Yuba focuses on outdoor activities
 
 export function AccountOverview() {
   const { user } = useUser();
   const { profile, isLoading: profileLoading } = useProfile();
   const { settings: aiSettings, isLoading: aiLoading } = useAISettings();
-  const { settings: appearanceSettings, isLoading: appearanceLoading } =
-    useAppearanceSettings();
 
-  const isLoading = profileLoading || aiLoading || appearanceLoading;
+  const isLoading = profileLoading || aiLoading;
 
   if (isLoading) {
     return (
@@ -51,10 +46,10 @@ export function AccountOverview() {
     );
   }
 
-  // Mock data for now - would come from activity tracking
-  const totalHikes = 12;
-  const totalMiles = 87;
-  const savedTrails = 5;
+  // Mock data for now - would come from scraping history
+  const totalRuns = 12;
+  const pagesScraped = 87;
+  const savedExports = 5;
   const joinDate = user?.createdAt
     ? new Date(user.createdAt).toLocaleDateString()
     : "";
@@ -76,63 +71,63 @@ export function AccountOverview() {
 
             {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {/* Total Hikes */}
+              {/* Total Runs */}
               <div className="border border-border bg-card p-6 rounded-lg hover:border-foreground/20 transition-colors">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="h-10 w-10 bg-green-500/10 text-green-600 border border-green-500/20 rounded-lg flex items-center justify-center">
-                    <Mountains size={20} weight="duotone" />
+                  <div className="h-10 w-10 bg-fire-orange/10 text-fire-orange border border-fire-orange/20 rounded-lg flex items-center justify-center">
+                    <Fire size={20} weight="duotone" />
                   </div>
                   <div>
                     <div className="text-2xl font-bold font-mono">
-                      {totalHikes}
+                      {totalRuns}
                     </div>
                     <div className="text-sm text-muted-foreground">
-                      Total Hikes
+                      Scrape Runs
                     </div>
                   </div>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Outdoor adventures completed
+                  Web scraping sessions completed
                 </p>
               </div>
 
-              {/* Total Miles */}
+              {/* Pages Scraped */}
               <div className="border border-border bg-card p-6 rounded-lg hover:border-foreground/20 transition-colors">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="h-10 w-10 bg-blue-500/10 text-blue-600 border border-blue-500/20 rounded-lg flex items-center justify-center">
-                    <Footprints size={20} weight="duotone" />
+                    <Globe size={20} weight="duotone" />
                   </div>
                   <div>
                     <div className="text-2xl font-bold font-mono">
-                      {totalMiles}
+                      {pagesScraped}
                     </div>
                     <div className="text-sm text-muted-foreground">
-                      Miles Hiked
+                      Pages Scraped
                     </div>
                   </div>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Total distance covered
+                  Total URLs processed
                 </p>
               </div>
 
-              {/* Saved Trails */}
+              {/* Saved Exports */}
               <div className="border border-border bg-card p-6 rounded-lg hover:border-foreground/20 transition-colors">
                 <div className="flex items-center gap-3 mb-3">
                   <div className="h-10 w-10 bg-purple-500/10 text-purple-600 border border-purple-500/20 rounded-lg flex items-center justify-center">
-                    <MapPin size={20} weight="duotone" />
+                    <Database size={20} weight="duotone" />
                   </div>
                   <div>
                     <div className="text-2xl font-bold font-mono">
-                      {savedTrails}
+                      {savedExports}
                     </div>
                     <div className="text-sm text-muted-foreground">
-                      Saved Trails
+                      Data Exports
                     </div>
                   </div>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Favorite outdoor destinations
+                  Structured data downloads
                 </p>
               </div>
             </div>
@@ -171,26 +166,19 @@ export function AccountOverview() {
                   </div>
                 </div>
 
-                {/* Preferences */}
+                {/* AI Preferences */}
                 <div className="border border-border bg-card p-6 rounded-lg">
                   <h4 className="font-medium mb-4 flex items-center gap-2">
-                    <Palette size={16} weight="duotone" />
-                    Preferences
+                    <Brain size={16} weight="duotone" />
+                    AI Preferences
                   </h4>
                   <div className="space-y-3 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Tier:</span>
-                      <span className="font-mono capitalize">
-                        {profile?.tier || "free"}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
                       <span className="text-muted-foreground">
-                        Default Model:
+                        Custom Rules:
                       </span>
                       <span className="font-mono text-xs">
-                        {aiSettings?.defaultModel ||
-                          SPACE_DEFAULTS.DEFAULT_MODEL}
+                        {aiSettings?.rules ? "Configured" : "None"}
                       </span>
                     </div>
                   </div>

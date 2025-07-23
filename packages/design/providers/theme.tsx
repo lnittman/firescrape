@@ -1,22 +1,7 @@
 'use client';
 
 import type { ThemeProviderProps } from 'next-themes';
-import { ThemeProvider as NextThemeProvider, useTheme } from 'next-themes';
-import { useEffect } from 'react';
-
-const ThemeColorUpdater = () => {
-  const { resolvedTheme } = useTheme();
-
-  useEffect(() => {
-    const color = resolvedTheme === 'dark' ? '#0a0a0a' : '#ffffff';
-    const meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) {
-      meta.setAttribute('content', color);
-    }
-  }, [resolvedTheme]);
-
-  return null;
-};
+import { ThemeProvider as NextThemeProvider } from 'next-themes';
 
 export const ThemeProvider = ({
   children,
@@ -24,12 +9,12 @@ export const ThemeProvider = ({
 }: ThemeProviderProps) => (
   <NextThemeProvider
     attribute="class"
-    defaultTheme="system"
-    enableSystem
+    defaultTheme="light"
+    forcedTheme="light"
+    enableSystem={false}
     disableTransitionOnChange
     {...properties}
   >
-    <ThemeColorUpdater />
     {children}
   </NextThemeProvider>
 );

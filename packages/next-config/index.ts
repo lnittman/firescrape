@@ -1,4 +1,6 @@
 import withBundleAnalyzer from '@next/bundle-analyzer';
+// @ts-expect-error No declaration file
+import { PrismaPlugin } from '@prisma/nextjs-monorepo-workaround-plugin';
 import type { NextConfig } from 'next';
 
 const otelRegex = /@opentelemetry\/instrumentation/;
@@ -48,6 +50,11 @@ export const config: NextConfig = {
 
   webpack(config, { isServer, nextRuntime }) {
     config.ignoreWarnings = [{ module: otelRegex }];
+
+    // Add Prisma plugin for server builds in monorepo
+    if (isServer) {
+      config.plugins = [...config.plugins, new PrismaPlugin()];
+    }
 
     // Optimize client-side bundles
     if (!isServer && nextRuntime !== 'edge') {

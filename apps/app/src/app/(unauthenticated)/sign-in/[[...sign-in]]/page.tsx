@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 import { CustomSignIn } from '@/components/auth/sign-in';
 
 const title = 'Sign In';
-const description = 'Discover trails and plan your outdoor adventures with AI.';
+const description = 'Turn any URL into clean, structured data with Firescrape.';
 
 export const metadata: Metadata = createMetadata({ title, description });
 

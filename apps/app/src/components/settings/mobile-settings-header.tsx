@@ -12,7 +12,7 @@ export function MobileSettingsHeader({ title }: MobileSettingsHeaderProps) {
     const router = useTransitionRouter();
 
     const handleBack = () => {
-        router.push('/account/settings');
+        router.push('/settings');
     };
 
     return (

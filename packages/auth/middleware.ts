@@ -36,7 +36,9 @@ const defaultPublicRoutes = [
   '/favicon.ico',
   '/images(.*)',
   '/home(.*)',
-  '/CLERKJS(.*)'  // Allow Clerk's internal navigation routes
+  '/manifest.webmanifest',
+  '/offline.html',
+  '/sw.js'
 ];
 
 export function authMiddleware(config: AuthMiddlewareConfig = {}) {

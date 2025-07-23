@@ -9,9 +9,9 @@ import {
     countries,
     continentOrder,
     type Country,
-} from "@/components/shared/ui/flag-picker-button";
+} from "@/lib/constants/countries";
 import { mobileCountryPickerOpenAtom } from "@/atoms/menus";
-import { useIsMobile } from "@repo/design/hooks/use-mobile";
+import { useIsMobile } from "@repo/design/hooks/useMobile";
 
 interface MobileCountryPickerOverlayProps {
     selectedCountry?: Country;
@@ -49,8 +49,9 @@ function MobileCountryPickerOverlayContent({ selectedCountry, onSelect }: Mobile
     const groupedCountries = React.useMemo(() => {
         const groups: Record<string, Country[]> = {};
         filteredCountries.forEach((country) => {
-            if (!groups[country.continent]) groups[country.continent] = [];
-            groups[country.continent].push(country);
+            const continent = country.continent || 'Other';
+            if (!groups[continent]) groups[continent] = [];
+            groups[continent].push(country);
         });
         Object.keys(groups).forEach((continent) => {
             groups[continent].sort((a, b) => a.name.localeCompare(b.name));

@@ -3,7 +3,7 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAtom } from "jotai";
-import { isMobileMenuOpenAtom } from "@/atoms/modals";
+import { isMobileMenuOpenAtom, scrapeOptionsModalOpenAtom, scrapeAgentModalOpenAtom } from "@/atoms/modals";
 import {
   mobileEmojiPickerOpenAtom,
   mobileFeedbackOpenAtom,
@@ -12,7 +12,9 @@ import {
   mobileUserMenuOpenAtom,
   mobileCountryPickerOpenAtom,
   mobileEmailSettingsOpenAtom,
-  mobileFeedbackTypeOpenAtom
+  mobileFeedbackTypeOpenAtom,
+  mobileScrapeExampleOpenAtom,
+  mobileScrapeModelOpenAtom
 } from "@/atoms/menus";
 
 export function MobileBlurOverlay() {
@@ -25,6 +27,10 @@ export function MobileBlurOverlay() {
   const [, setMobileCountryPickerOpen] = useAtom(mobileCountryPickerOpenAtom);
   const [, setMobileEmailSettingsOpen] = useAtom(mobileEmailSettingsOpenAtom);
   const [, setMobileFeedbackTypeOpen] = useAtom(mobileFeedbackTypeOpenAtom);
+  const [, setScrapeOptionsOpen] = useAtom(scrapeOptionsModalOpenAtom);
+  const [, setScrapeAgentOpen] = useAtom(scrapeAgentModalOpenAtom);
+  const [, setMobileScrapeExampleOpen] = useAtom(mobileScrapeExampleOpenAtom);
+  const [, setMobileScrapeModelOpen] = useAtom(mobileScrapeModelOpenAtom);
 
   // Close all mobile modals when backdrop is clicked (let them handle global state)
   const handleBackdropClick = () => {
@@ -37,6 +43,10 @@ export function MobileBlurOverlay() {
     setMobileCountryPickerOpen(false);
     setMobileEmailSettingsOpen(false);
     setMobileFeedbackTypeOpen(false);
+    setScrapeOptionsOpen(false);
+    setScrapeAgentOpen(false);
+    setMobileScrapeExampleOpen(false);
+    setMobileScrapeModelOpen(false);
 
     // Don't immediately close global state - let modals handle this after animation
   };

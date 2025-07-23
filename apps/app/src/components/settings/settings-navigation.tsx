@@ -1,17 +1,12 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Link as LinkTransition } from 'next-view-transitions';
 import {
     User,
-    Palette,
     Database,
-    Bell,
-    ShieldCheck,
-    CreditCard,
-    Cube,
+    Brain,
     MagnifyingGlass,
     X
 } from '@phosphor-icons/react/dist/ssr';
@@ -21,7 +16,7 @@ import { cn } from '@repo/design/lib/utils';
 const settingsData = [
     {
         title: 'General',
-        href: '/account/settings/general',
+        href: '/settings/general',
         icon: User,
         description: 'Personal information and preferences',
         subsections: [
@@ -33,41 +28,18 @@ const settingsData = [
         ]
     },
     {
-        title: 'Appearance',
-        href: '/account/settings/appearance',
-        icon: Palette,
-        description: 'Customize the look and feel',
+        title: 'AI Settings',
+        href: '/settings/ai',
+        icon: Brain,
+        description: 'Configure AI extraction rules',
         subsections: [
-            'Theme',
-            'Font Family',
-            'Colors',
-            'Layout'
-        ]
-    },
-    {
-        title: 'Notifications',
-        href: '/account/settings/notifications',
-        icon: Bell,
-        description: 'Email and push notification preferences',
-        subsections: [
-            'Email Notifications',
-            'Push Notifications',
-            'Desktop Alerts',
-            'Mobile Alerts'
-        ]
-    },
-    {
-        title: 'Models',
-        href: '/account/settings/models',
-        icon: Cube,
-        description: 'Configure preferred AI models',
-        subsections: [
-            'Model Library'
+            'Custom Rules',
+            'Extraction Preferences'
         ]
     },
     {
         title: 'Data & Privacy',
-        href: '/account/settings/data',
+        href: '/settings/data',
         icon: Database,
         description: 'Export or delete your data',
         subsections: [
@@ -76,31 +48,6 @@ const settingsData = [
             'Privacy Settings',
             'Data Usage',
             'Storage'
-        ]
-    },
-    {
-        title: 'Security',
-        href: '/account/settings/security',
-        icon: ShieldCheck,
-        description: 'Password and authentication',
-        subsections: [
-            'Password',
-            'Two-Factor Authentication',
-            'Sessions',
-            'API Keys'
-        ]
-    },
-    {
-        title: 'Billing',
-        href: '/account/settings/billing',
-        icon: CreditCard,
-        description: 'Subscription and payment methods',
-        subsections: [
-            'Subscription',
-            'Payment Methods',
-            'Invoices',
-            'Billing Address',
-            'Usage'
         ]
     },
 ];
@@ -208,7 +155,7 @@ export function SettingsNavigation({ rootActive = false }: SettingsNavigationPro
                         // the `rootActive` prop. Mobile views of the root page
                         // pass `false` so the item is not highlighted.
                         const isActive = item.title === 'General'
-                            ? pathname === '/account/settings/general' || (rootActive && pathname === '/account/settings')
+                            ? pathname === '/settings/general' || (rootActive && pathname === '/settings')
                             : pathname === item.href;
                         const Icon = item.icon;
 

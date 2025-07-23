@@ -2,26 +2,18 @@
 
 import React, { useState, Suspense, useEffect } from "react";
 
-import { SignOutButton, useAuth, useUser } from "@repo/auth/client";
 import {
   SignOut,
   Gear,
-  Moon,
-  Sun,
-  Desktop,
   House,
-  Users,
-  Command,
-  Palette,
-  CaretUpDown,
-  Plus,
+  User,
 } from "@phosphor-icons/react/dist/ssr";
-import { motion, AnimatePresence } from "framer-motion";
-import { useTheme } from "next-themes";
-import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 import { useAtom } from "jotai";
-import { searchModalOpenAtom, planTripModalOpenAtom } from "@/atoms/modals";
+import { useTransitionRouter } from "next-view-transitions";
 
+
+import { SignOutButton, useUser } from "@repo/auth/client";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -32,6 +24,8 @@ import {
 import { Skeleton } from "@repo/design/components/ui/skeleton";
 import { cn } from "@repo/design/lib/utils";
 
+import { searchModalOpenAtom } from "@/atoms/modals";
+
 // Skeleton component for the user menu button
 function UserMenuSkeleton() {
   return (
@@ -41,111 +35,18 @@ function UserMenuSkeleton() {
   );
 }
 
-// Theme selector component that prevents hydration issues
-function ThemeSelector() {
-  const { setTheme: setNextTheme, theme } = useTheme();
-  const [mounted, setMounted] = React.useState(false);
-
-  // Ensure we only render after hydration to prevent SSR mismatch
-  React.useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  const handleThemeChange = (value: string) => {
-    setNextTheme(value);
-  };
-
-  // Don't render the active states until mounted (prevents hydration mismatch)
-  if (!mounted) {
-    return (
-      <div className="flex items-center justify-between px-3 py-1.5 text-sm transition-all duration-200 group">
-        <div className="flex items-center gap-2">
-          <span className="text-muted-foreground group-hover:text-foreground transition-colors duration-200">Theme</span>
-        </div>
-        <div className="flex items-center gap-0.5 bg-background border border-border p-0.5 rounded-md transition-all duration-200">
-          <button
-            className="p-1 rounded-md transition-all duration-200 text-muted-foreground"
-            title="Light theme"
-          >
-            <Sun size={14} weight="duotone" />
-          </button>
-          <button
-            className="p-1 rounded-md transition-all duration-200 text-muted-foreground"
-            title="Dark theme"
-          >
-            <Moon size={14} weight="duotone" />
-          </button>
-          <button
-            className="p-1 rounded-md transition-all duration-200 text-muted-foreground"
-            title="System theme"
-          >
-            <Desktop size={14} weight="duotone" />
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="flex items-center justify-between px-3 py-1.5 text-sm transition-all duration-200 group">
-      <div className="flex items-center gap-2">
-        <span className="text-muted-foreground group-hover:text-foreground transition-colors duration-200">Theme</span>
-      </div>
-      <div className="flex items-center gap-0.5 bg-background border border-border p-0.5 rounded-md transition-all duration-200">
-        <button
-          onClick={() => handleThemeChange('light')}
-          className={cn(
-            "p-1 rounded-md transition-all duration-200",
-            theme === 'light'
-              ? "text-foreground border border-border"
-              : "text-muted-foreground hover:text-foreground"
-          )}
-          title="Light theme"
-        >
-          <Sun size={14} weight="duotone" />
-        </button>
-        <button
-          onClick={() => handleThemeChange('dark')}
-          className={cn(
-            "p-1 rounded-md transition-all duration-200",
-            theme === 'dark'
-              ? "text-foreground border border-border"
-              : "text-muted-foreground hover:text-foreground"
-          )}
-          title="Dark theme"
-        >
-          <Moon size={14} weight="duotone" />
-        </button>
-        <button
-          onClick={() => handleThemeChange('system')}
-          className={cn(
-            "p-1 rounded-md transition-all duration-200",
-            theme === 'system'
-              ? "text-foreground border border-border"
-              : "text-muted-foreground hover:text-foreground"
-          )}
-          title="System theme"
-        >
-          <Desktop size={14} weight="duotone" />
-        </button>
-      </div>
-    </div>
-  );
-}
-
 // Main user menu content component
 function UserMenuContent() {
   const { user } = useUser();
 
-  const router = useRouter();
+  const router = useTransitionRouter();
   const [menuOpen, setMenuOpen] = useState(false);
   const [, setSearchModalOpen] = useAtom(searchModalOpenAtom);
-  const [, setPlanTripModalOpen] = useAtom(planTripModalOpenAtom);
 
   // Close menu when resizing to mobile to prevent UI issues
   useEffect(() => {
     const handleResize = () => {
-      if (menuOpen && window.innerWidth < 768) { // Close on mobile breakpoint
+      if (menuOpen && window.innerWidth < 640) { // Close on mobile breakpoint
         setMenuOpen(false);
       }
     };
@@ -170,7 +71,7 @@ function UserMenuContent() {
   // Navigate to settings page
   const handleOpenSettings = () => {
     setMenuOpen(false);
-    router.push('/account/settings');
+    router.push('/settings');
   };
 
   // Navigate to dashboard
@@ -236,30 +137,20 @@ function UserMenuContent() {
             <div className="py-1 space-y-1">
               <DropdownMenuItem
                 onClick={handleOpenDashboard}
-                className="rounded-md mx-1 px-2 py-1.5 text-sm cursor-pointer transition-all duration-200 hover:bg-muted/30 group"
+                className="rounded-md mx-1 px-2 py-1.5 text-sm cursor-pointer transition-all duration-200 hover:bg-muted/30 group flex items-center justify-between"
               >
                 <span className="text-muted-foreground group-hover:text-foreground transition-colors duration-200">Dashboard</span>
+                <House className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors duration-200" weight="duotone" />
               </DropdownMenuItem>
 
               <DropdownMenuItem
                 onClick={handleOpenSettings}
-                className="rounded-md mx-1 px-2 py-1.5 text-sm cursor-pointer transition-all duration-200 hover:bg-muted/30 group"
+                className="rounded-md mx-1 px-2 py-1.5 text-sm cursor-pointer transition-all duration-200 hover:bg-muted/30 group flex items-center justify-between"
               >
                 <span className="text-muted-foreground group-hover:text-foreground transition-colors duration-200">Account Settings</span>
+                <User className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors duration-200" weight="duotone" />
               </DropdownMenuItem>
 
-              <DropdownMenuItem
-                onClick={() => {
-                  setMenuOpen(false);
-                  setPlanTripModalOpen(true);
-                }}
-                className="rounded-md mx-1 px-2 py-1.5 text-sm cursor-pointer transition-all duration-200 hover:bg-muted/30 group"
-              >
-                <span className="text-muted-foreground group-hover:text-foreground transition-colors duration-200">Plan Trip</span>
-                <div className="ml-auto">
-                  <Plus className="w-3 h-3 text-muted-foreground group-hover:text-foreground transition-all duration-200" weight="duotone" />
-                </div>
-              </DropdownMenuItem>
             </div>
 
             <DropdownMenuSeparator className="my-0" />
@@ -277,8 +168,6 @@ function UserMenuContent() {
                 <kbd className="ml-auto text-xs bg-background text-foreground border border-border px-1.5 py-0.5 rounded transition-all duration-200">⌘K</kbd>
               </div>
 
-              {/* Theme selector - now using consistent component */}
-              <ThemeSelector />
             </div>
 
             <DropdownMenuSeparator className="my-0" />
@@ -287,22 +176,18 @@ function UserMenuContent() {
             <div className="py-1 space-y-1">
               <DropdownMenuItem
                 onClick={() => router.push('/')}
-                className="rounded-md mx-1 px-2 py-1.5 text-sm cursor-pointer transition-all duration-200 hover:bg-muted/30 group"
+                className="rounded-md mx-1 px-2 py-1.5 text-sm cursor-pointer transition-all duration-200 hover:bg-muted/30 group flex items-center justify-between"
               >
                 <span className="text-muted-foreground group-hover:text-foreground transition-colors duration-200">Home Page</span>
-                <div className="ml-auto">
-                  <House className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-all duration-200" weight="duotone" />
-                </div>
+                <span className="text-base">🔥</span>
               </DropdownMenuItem>
 
               <SignOutButton>
                 <DropdownMenuItem
-                  className="rounded-md mx-1 px-2 py-1.5 text-sm cursor-pointer transition-all duration-200 hover:bg-red-500/10 group"
+                  className="rounded-md mx-1 px-2 py-1.5 text-sm cursor-pointer transition-all duration-200 hover:bg-red-500/10 group flex items-center justify-between"
                 >
                   <span className="text-red-500/70 group-hover:text-red-600 transition-colors duration-200">Log Out</span>
-                  <div className="ml-auto">
-                    <SignOut className="w-4 h-4 text-red-500/70 group-hover:text-red-600 transition-all duration-200" weight="duotone" />
-                  </div>
+                  <SignOut className="w-4 h-4 text-red-500/70 group-hover:text-red-600 transition-colors duration-200" weight="duotone" />
                 </DropdownMenuItem>
               </SignOutButton>
             </div>
@@ -310,7 +195,7 @@ function UserMenuContent() {
             <DropdownMenuSeparator className="my-0" />
 
             {/* Upgrade section */}
-            <div className="bg-muted/30 border-t border-border p-4 transition-all duration-200">
+            <div className="p-4">
               <button className="w-full bg-foreground text-background hover:bg-foreground/90 transition-all duration-200 rounded-md px-3 py-1.5 text-sm font-medium">
                 Upgrade to Pro
               </button>

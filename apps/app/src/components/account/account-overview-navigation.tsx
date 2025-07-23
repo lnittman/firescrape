@@ -16,14 +16,14 @@ const accountOverviewTabs = [
         title: 'Activities',
         href: '/account/activities',
         icon: Globe,
-        description: 'View your outdoor activities'
+        description: 'View your scraping history'
     },
     {
         id: 'saved',
         title: 'Saved',
         href: '/account/saved',
         icon: Folder,
-        description: 'Manage your saved trails and spots'
+        description: 'Manage your saved exports and data'
     }
 ];
 

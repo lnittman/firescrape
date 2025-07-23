@@ -1,2 +1,2 @@
-export { useClickAway } from "./use-click-away";
-export { useIsMobile } from "./use-mobile";
+export { useClickAway } from "./useClickAway";
+export { useIsMobile } from "./useMobile";

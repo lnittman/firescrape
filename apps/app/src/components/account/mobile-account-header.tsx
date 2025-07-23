@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useTransitionRouter } from 'next-view-transitions';
 import { CaretLeft } from '@phosphor-icons/react';
 import { cn } from '@repo/design/lib/utils';
 
@@ -9,7 +9,7 @@ interface MobileAccountHeaderProps {
 }
 
 export function MobileAccountHeader({ title }: MobileAccountHeaderProps) {
-    const router = useRouter();
+    const router = useTransitionRouter();
 
     const handleBack = () => {
         router.push('/account');

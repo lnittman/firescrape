@@ -1,13 +1,15 @@
 "use client";
 
 import React, { Suspense } from "react";
-import { useAuth } from "@repo/auth/client";
+
 import { X, List } from "@phosphor-icons/react/dist/ssr";
+import { motion, AnimatePresence } from "framer-motion";
 import { useAtom } from "jotai";
+
 import { Skeleton } from "@repo/design/components/ui/skeleton";
 import { cn } from "@repo/design/lib/utils";
-import { motion, AnimatePresence } from "framer-motion";
-import { mobileUserMenuOpenAtom, mobileChatOpenAtom } from "@/atoms/menus";
+
+import { mobileUserMenuOpenAtom } from "@/atoms/menus";
 
 // Skeleton component for the mobile user menu button
 function MobileUserMenuSkeleton() {
@@ -21,7 +23,6 @@ function MobileUserMenuSkeleton() {
 // Main mobile user menu trigger component
 function MobileUserMenuContent() {
   const [isOpen, setIsOpen] = useAtom(mobileUserMenuOpenAtom);
-  const [isMobileChatOpen] = useAtom(mobileChatOpenAtom);
 
   return (
     <button
@@ -48,9 +49,9 @@ function MobileUserMenuContent() {
         ) : (
           <motion.div
             key="menu"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             transition={{ duration: 0.2, ease: "easeInOut" }}
           >
             <List className="w-4 h-4" weight="duotone" />

@@ -22,6 +22,7 @@ import {
     DropdownMenuTrigger,
 } from "@repo/design/components/ui/dropdown-menu";
 import { cn } from "@repo/design/lib/utils";
+import { useClickAway } from '@repo/design/hooks/useClickAway';
 
 interface FeedbackMenuProps {
     className?: string;
@@ -43,11 +44,19 @@ export function FeedbackMenu({ className }: FeedbackMenuProps) {
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [showTopicDropdown, setShowTopicDropdown] = useState(false);
     const [sentiment, setSentiment] = useState<'positive' | 'negative' | null>(null);
+    const topicDropdownRef = React.useRef<HTMLDivElement>(null);
+    
+    // Handle clicks outside topic dropdown
+    useClickAway(topicDropdownRef, () => {
+        if (showTopicDropdown) {
+            setShowTopicDropdown(false);
+        }
+    });
 
     // Close menu when resizing to mobile to prevent UI issues
     useEffect(() => {
         const handleResize = () => {
-            if (isOpen && window.innerWidth < 768) { // Close on mobile breakpoint
+            if (isOpen && window.innerWidth < 640) { // Close on mobile breakpoint
                 setIsOpen(false);
             }
         };
@@ -160,10 +169,13 @@ export function FeedbackMenu({ className }: FeedbackMenuProps) {
                             <div className="p-4 space-y-4">
                                 {/* Topic Selection */}
                                 <div className="space-y-2">
-                                    <div className="relative">
+                                    <div className="relative" ref={topicDropdownRef}>
                                         <button
                                             type="button"
-                                            onClick={() => setShowTopicDropdown(!showTopicDropdown)}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setShowTopicDropdown(!showTopicDropdown);
+                                            }}
                                             className="w-full h-9 px-3 pr-8 bg-background border border-border rounded-md text-sm text-left flex items-center justify-between hover:border-foreground/20 focus:outline-none focus:ring-2 focus:ring-foreground/20 focus:border-foreground/30 transition-all duration-200 font-mono"
                                         >
                                             <div className="flex items-center gap-2">

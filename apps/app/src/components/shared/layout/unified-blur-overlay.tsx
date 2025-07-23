@@ -3,15 +3,14 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAtom, useSetAtom } from "jotai";
-import { shouldShowBlurOverlayAtom } from "@/atoms/modal-overlay";
 import { 
     searchModalOpenAtom,
-    locationPickerOpenAtom,
-    interestPickerOpenAtom,
+    shouldShowBlurOverlayAtom, 
     deleteAccountModalOpenAtom,
     clearDataModalOpenAtom,
     avatarUploadModalOpenAtom
 } from "@/atoms/modals";
+import { mobileFeedbackOpenAtom } from "@/atoms/menus";
 
 export function UnifiedBlurOverlay() {
     const [shouldShowBlur] = useAtom(shouldShowBlurOverlayAtom);
@@ -24,20 +23,18 @@ export function UnifiedBlurOverlay() {
     
     // Setters for closing modals
     const setSearchOpen = useSetAtom(searchModalOpenAtom);
-    const setLocationPickerOpen = useSetAtom(locationPickerOpenAtom);
-    const setInterestPickerOpen = useSetAtom(interestPickerOpenAtom);
     const setDeleteAccountOpen = useSetAtom(deleteAccountModalOpenAtom);
     const setClearDataOpen = useSetAtom(clearDataModalOpenAtom);
     const setAvatarUploadOpen = useSetAtom(avatarUploadModalOpenAtom);
+    const setMobileFeedbackOpen = useSetAtom(mobileFeedbackOpenAtom);
     
     const handleOverlayClick = () => {
-        // Close all modals when clicking the overlay
+        // Close all modals when clicking the overlay (except scrape modals)
         setSearchOpen(false);
-        setLocationPickerOpen(false);
-        setInterestPickerOpen(false);
         setDeleteAccountOpen(false);
         setClearDataOpen(false);
         setAvatarUploadOpen(false);
+        setMobileFeedbackOpen(false);
     };
 
     // Don't render on server

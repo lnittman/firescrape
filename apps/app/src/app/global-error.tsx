@@ -14,7 +14,7 @@ const GlobalError = ({ error, reset }: GlobalErrorProperties) => {
   return (
     <html lang="en" className={fonts}>
       <body>
-        <h1>Oops, something went wrong</h1>
+        <h1>Something went wrong...</h1>
         <Button onClick={() => reset()}>Try again</Button>
       </body>
     </html>

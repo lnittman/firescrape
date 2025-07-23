@@ -1,0 +1,33 @@
+/* Louize Display - Title/Display Font */
+@font-face {
+  font-family: 'Louize Display';
+  src: url('/fonts/louize/LouizeDisplayTrialCnd-Regular.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Louize Display';
+  src: url('/fonts/louize/LouizeDisplayTrialCnd-Medium.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Louize Display';
+  src: url('/fonts/louize/LouizeDisplayTrialCnd-Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* TX-02 Mono - Body Text Font */
+@font-face {
+  font-family: 'TX02Mono-Regular';
+  src: url('https://intdev-global.s3.us-west-2.amazonaws.com/public/internet-dev/e049dfb6-9c5d-4ac4-97c2-eb6e95c61d09.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}

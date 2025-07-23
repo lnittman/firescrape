@@ -1,7 +1,6 @@
-import { atom } from 'jotai';
-import { useAtom } from 'jotai';
-import { mobileUserMenuOpenAtom } from './menus';
-import type { Trail } from '@repo/api';
+import { atom, useAtom } from 'jotai';
+
+import { mobileFeedbackOpenAtom, mobileUserMenuOpenAtom } from './menus';
 
 // Modal state atoms - each modal has its own open/close state
 export const avatarUploadModalOpenAtom = atom(false);
@@ -16,14 +15,31 @@ if (typeof window !== 'undefined') {
         clearData: false
     });
 }
-export const searchModalOpenAtom = atom(false);
-export const providerModelsModalOpenAtom = atom(false);
-export const chatModalOpenAtom = atom(false);
 
-// Trail-specific modal atoms
-export const trailDetailsModalOpenAtom = atom(false);
-export const activityLogModalOpenAtom = atom(false);
-export const emergencyContactModalOpenAtom = atom(false);
+export const searchModalOpenAtom = atom(false);
+export const quickActionsOpenAtom = atom(false);
+
+// Scrape modals
+export const scrapeOptionsModalOpenAtom = atom(false);
+export const scrapeAgentModalOpenAtom = atom(false);
+export const scrapeTabsModalOpenAtom = atom(false);
+export const scrapeFormatsModalOpenAtom = atom(false);
+
+// Debug logging for scrape modals
+if (typeof window !== 'undefined') {
+    console.log('Scrape modal atoms initialized:', {
+        scrapeOptions: false,
+        scrapeAgent: false,
+        scrapeTabs: false,
+        scrapeFormats: false
+    });
+}
+
+// Scrape tabs callback
+export const scrapeTabsCallbackAtom = atom<{
+  onSelectUrl?: (url: string) => void;
+  onSelectMultipleUrls?: (urls: string[]) => void;
+} | null>(null);
 
 // Global mobile menu session state - controls main page blur overlay
 // Only set to false when user completely exits mobile menu system
@@ -31,33 +47,6 @@ export const isMobileMenuOpenAtom = atom(false);
 
 // Avatar upload modal specific state
 export const avatarUploadFileAtom = atom<File | null>(null);
-
-// Provider models modal specific state
-export const providerModelsModalDataAtom = atom<{
-    provider: string;
-    models: any[];
-    enabled: string[];
-    isVerified: boolean;
-    onToggle: (id: string, value: boolean) => void;
-} | null>(null);
-
-// Trail modal specific state
-export const selectedTrailAtom = atom<Trail | null>(null);
-
-// Chat modal specific state
-export const chatModalDataAtom = atom<Trail | null>(null);
-
-// chat panel state (desktop)
-export const foxChatOpenAtom = atom(false);
-
-// Trail planning modal atoms
-export const planTripModalOpenAtom = atom(false);
-export const shareTrailModalOpenAtom = atom(false);
-export const weatherAlertModalOpenAtom = atom(false);
-
-// Location and Interest modal atoms
-export const locationPickerOpenAtom = atom(false);
-export const interestPickerOpenAtom = atom(false);
 
 /**
  * Custom hook for opening mobile menus with automatic user menu closing
@@ -80,3 +69,34 @@ export function useMobileMenuTransition<T extends boolean>(menuAtom: any, preser
 
     return openMenu;
 }
+
+export const shouldShowBlurOverlayAtom = atom((get) => {
+    const isAvatarUploadOpen = get(avatarUploadModalOpenAtom);
+    const isDeleteAccountOpen = get(deleteAccountModalOpenAtom);
+    const isClearDataOpen = get(clearDataModalOpenAtom);
+    const isSearchOpen = get(searchModalOpenAtom);
+    
+    // Mobile feedback overlay
+    const isMobileFeedbackOpen = get(mobileFeedbackOpenAtom);
+    
+    // Show blur overlay if any modal is open (excluding mobile user menu and scrape modals)
+    return isAvatarUploadOpen || isDeleteAccountOpen || 
+           isClearDataOpen || isSearchOpen || 
+           isMobileFeedbackOpen;
+});
+
+// Atom to track if we're in a modal transition state
+export const isModalTransitionAtom = atom((get) => {
+    const isAvatarUploadOpen = get(avatarUploadModalOpenAtom);
+    const isDeleteAccountOpen = get(deleteAccountModalOpenAtom);
+    const isClearDataOpen = get(clearDataModalOpenAtom);
+    const isSearchOpen = get(searchModalOpenAtom);
+    const isScrapeOptionsOpen = get(scrapeOptionsModalOpenAtom);
+    const isScrapeAgentOpen = get(scrapeAgentModalOpenAtom);
+    const isScrapeTabsOpen = get(scrapeTabsModalOpenAtom);
+    const isScrapeFormatsOpen = get(scrapeFormatsModalOpenAtom);
+    
+    return isAvatarUploadOpen || isDeleteAccountOpen || 
+           isClearDataOpen || isSearchOpen ||
+           isScrapeOptionsOpen || isScrapeAgentOpen || isScrapeTabsOpen || isScrapeFormatsOpen;
+}); 

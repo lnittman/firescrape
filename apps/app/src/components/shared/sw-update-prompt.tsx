@@ -66,7 +66,7 @@ export function ServiceWorkerUpdatePrompt() {
         <div className="flex-1">
           <h3 className="font-medium text-sm">Update Available</h3>
           <p className="text-sm text-muted-foreground mt-1">
-            A new version of Yuba is available. Refresh to update.
+            A new version of Firescrape is available. Refresh to update.
           </p>
           <div className="flex gap-2 mt-3">
             <Button

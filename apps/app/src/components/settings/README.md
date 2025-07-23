@@ -13,9 +13,7 @@ settings/
 ├── settings-navigation.ts    # Navigation configuration
 ├── settings-content.tsx      # Content router component
 ├── general-settings.tsx      # General settings section
-├── appearance-settings.tsx   # Appearance settings section
 ├── data-settings.tsx        # Data management section
-├── notification-settings.tsx # Notification settings section
 └── README.md                # This file
 ```
 

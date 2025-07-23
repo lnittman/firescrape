@@ -1,0 +1,1 @@
+export { HoverBorderGradient } from './hover-border-gradient';

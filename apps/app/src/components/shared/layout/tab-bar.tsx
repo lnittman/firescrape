@@ -1,7 +1,7 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import Link from 'next/link';
+import { Link } from 'next-view-transitions';
 import { motion } from 'framer-motion';
 import { 
   Compass, 
@@ -13,7 +13,7 @@ import {
 } from '@phosphor-icons/react';
 import { cn } from '@repo/design/lib/utils';
 import { useAtom } from 'jotai';
-import { quickActionsOpenAtom } from '@/atoms/navigation';
+import { quickActionsOpenAtom } from '@/atoms/modals';
 
 interface TabItem {
   href: string;

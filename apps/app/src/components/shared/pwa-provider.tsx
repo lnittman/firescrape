@@ -90,45 +90,14 @@ export const PwaProvider = () => {
     }
   }, [waitingWorker])
 
-  // Install prompt handling
+  // Install prompt handling - disabled for desktop
   useEffect(() => {
-    let deferredPrompt: BeforeInstallPromptEvent | null = null
-
     const handleBeforeInstallPrompt = (e: BeforeInstallPromptEvent) => {
-      // Prevent the mini-infobar from appearing on mobile
+      // Always prevent the install prompt
       e.preventDefault()
-      // Stash the event so it can be triggered later
-      deferredPrompt = e
-
-      // Show install button or prompt
-      const shouldShowPrompt = localStorage.getItem('pwa-install-dismissed') !== 'true'
-
-      if (shouldShowPrompt) {
-        setTimeout(() => {
-          toast('Install Yuba app for a better experience', {
-            action: {
-              label: 'Install',
-              onClick: async () => {
-                if (deferredPrompt) {
-                  deferredPrompt.prompt()
-                  const { outcome } = await deferredPrompt.userChoice
-                  if (outcome === 'accepted') {
-                    if (process.env.NODE_ENV === 'development') {
-                      console.log('[PWA] User accepted the install prompt')
-                    }
-                  }
-                  deferredPrompt = null
-                }
-              }
-            },
-            cancel: {
-              label: 'Not now',
-              onClick: () => {
-                localStorage.setItem('pwa-install-dismissed', 'true')
-              }
-            }
-          })
-        }, 30000) // Show after 30 seconds
+      
+      if (process.env.NODE_ENV === 'development') {
+        console.log('[PWA] Install prompt prevented')
       }
     }
 
@@ -139,13 +108,12 @@ export const PwaProvider = () => {
     }
   }, [])
 
-  // App installed handling
+  // App installed handling - removed success toast
   useEffect(() => {
     const handleAppInstalled = () => {
       if (process.env.NODE_ENV === 'development') {
         console.log('[PWA] App was installed')
       }
-      toast.success('Yuba has been installed successfully!')
     }
 
     window.addEventListener('appinstalled', handleAppInstalled)

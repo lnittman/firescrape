@@ -1,12 +1,10 @@
 import { auth, currentUser } from '@repo/auth/server';
 import { secure } from '@repo/security';
-import { NotificationsProvider } from '@repo/notifications/components/provider';
 import { redirect } from 'next/navigation';
 
 import { env } from '../../../env';
 import { ClientLayout } from '@/app/(authenticated)/client-layout';
-import { PostHogIdentifier } from '@/components/shared/posthog-identifier';
-import { SWRProvider } from '@/providers/swr-provider';
+import { SWRProvider } from '@/lib/swr/provider';
 
 import type { ReactNode } from 'react';
 
@@ -48,9 +46,10 @@ const AppLayout = async ({ children }: AppLayoutProperties) => {
   }
 
   const user = await currentUser();
+  const { redirectToSignIn } = await auth();
 
   if (!user) {
-    redirect('/sign-in');
+    return redirectToSignIn();
   }
 
   // Prefetch common data for all authenticated pages
@@ -60,14 +59,11 @@ const AppLayout = async ({ children }: AppLayoutProperties) => {
   return (
     <>
       <script dangerouslySetInnerHTML={{ __html: fontInitScript }} />
-      <NotificationsProvider userId={user.id}>
-        <SWRProvider fallback={fallback}>
-          <ClientLayout>
-            {children}
-          </ClientLayout>
-        </SWRProvider>
-        <PostHogIdentifier />
-      </NotificationsProvider>
+      <SWRProvider fallback={fallback}>
+        <ClientLayout>
+          {children}
+        </ClientLayout>
+      </SWRProvider>
     </>
   );
 };

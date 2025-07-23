@@ -48,6 +48,7 @@ function MobileFeedbackOverlayContent() {
     const [, setFeedbackTypeCallback] = useAtom(mobileFeedbackTypeCallbackAtom);
     const openTypeMenu = useMobileMenuTransition(mobileFeedbackTypeOpenAtom, true);
     const [sentiment, setSentiment] = useState<'positive' | 'negative' | null>(null);
+    const [isTypeMenuOpen] = useAtom(mobileFeedbackTypeOpenAtom);
 
     // Ref for the textarea to handle autofocus
     const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -149,6 +150,7 @@ function MobileFeedbackOverlayContent() {
             position="bottom"
             spacing="sm"
             contentPadding={false}
+            hasSubsheetOpen={isTypeMenuOpen}
         >
             <div className="p-4">
                 {isSubmitted ? (

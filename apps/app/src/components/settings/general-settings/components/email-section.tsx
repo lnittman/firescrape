@@ -5,7 +5,7 @@ import { useUser } from '@repo/auth/client';
 import { EmailActionsMenu } from '@/components/shared/menu/email-actions-menu';
 import { MobileEmailSettingsMenu } from '@/components/shared/menu/email/mobile-email-settings-menu';
 import { Plus } from '@phosphor-icons/react/dist/ssr';
-import { useIsMobile } from '@repo/design/hooks/use-mobile';
+import { useIsMobile } from '@repo/design/hooks/useMobile';
 
 interface EmailSectionProps {
     onSetAsPrimary: (emailId: string) => void;
@@ -23,7 +23,7 @@ export function EmailSection({ onSetAsPrimary, onDelete, onAddEmail }: EmailSect
                 <div className="space-y-2">
                     <label className="text-sm font-medium font-mono">Email</label>
                     <p className="text-sm text-muted-foreground">
-                        Enter the email addresses you want to use to log in with Yuba. Your primary email will be used for account-related notifications.
+                        Enter the email addresses you want to use to log in with Firescrape. Your primary email will be used for account-related notifications.
                     </p>
                     <div className="space-y-2">
                         {user?.emailAddresses?.map((email, index) => (
